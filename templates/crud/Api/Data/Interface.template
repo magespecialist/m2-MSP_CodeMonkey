@@ -1,0 +1,16 @@
+<?php
+/**
+ * Automatically created by MageSpecialist CodeMonkey
+ * https://github.com/magespecialist/m2-MSP_CodeMonkey
+ */
+
+namespace %namespace%;
+
+interface %class%
+{
+%const_list%
+
+%getter_list%
+
+%setter_list%
+}

@@ -1,0 +1,21 @@
+<?php
+/**
+ * Automatically created by MageSpecialist CodeMonkey
+ * https://github.com/magespecialist/m2-MSP_CodeMonkey
+ */
+
+namespace %namespace%;
+
+use Magento\Framework\Model\AbstractModel;
+
+class %class% extends AbstractModel implements %interface%
+{
+    protected function _construct()
+    {
+        $this->_init('%resource_model%');
+    }
+
+%getter_list%
+
+%setter_list%
+}

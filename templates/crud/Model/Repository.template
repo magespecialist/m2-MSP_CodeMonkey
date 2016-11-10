@@ -1,0 +1,108 @@
+<?php
+/**
+ * Automatically created by MageSpecialist CodeMonkey
+ * https://github.com/magespecialist/m2-MSP_CodeMonkey
+ */
+
+namespace %namespace%;
+
+class %class% implements %interface%
+{
+    protected $objectResource;
+    protected $objectFactory;
+    protected $searchResultsFactory;
+
+    protected $registry = [];
+
+    public function __construct(
+        %data_interface%Factory $objectFactory,
+        %resource% $objectResource,
+        \Magento\Framework\Api\SearchResultsInterfaceFactory $searchResultsFactory
+    ) {
+        $this->searchResultsFactory = $searchResultsFactory;
+        $this->objectFactory = $objectFactory;
+        $this->objectResource = $objectResource;
+    }
+
+    protected function clearRegistry($id)
+    {
+        if (isset($this->registry[$id])) {
+            unset($this->registry[$id]);
+        }
+    }
+
+    public function save(%data_interface% $object)
+    {
+        $this->objectResource->save($object);
+        $this->clearRegistry($object->getId());
+
+        return $object;
+    }
+
+    public function getById($id)
+    {
+        if (!isset($this->registry[$id])) {
+            $object = $this->objectFactory->create();
+            $this->objectResource->load($object, $id);
+
+            $this->registry[$id] = $object;
+        }
+
+        return $this->registry[$id];
+    }
+
+    public function delete(%data_interface% $object)
+    {
+        $this->objectResource->delete($object);
+        $this->clearRegistry($object->getId());
+    }
+
+    public function deleteById($id)
+    {
+        return $this->delete($this->getById($id));
+    }
+
+    public function getList(\Magento\Framework\Api\SearchCriteriaInterface $criteria)
+    {
+        $searchResults = $this->searchResultsFactory->create();
+        $searchResults->setSearchCriteria($criteria);
+        $collection = $this->collectionFactory->create();
+
+        foreach ($criteria->getFilterGroups() as $filterGroup) {
+            $fields = [];
+            $conditions = [];
+
+            foreach ($filterGroup->getFilters() as $filter) {
+                $condition = $filter->getConditionType() ? $filter->getConditionType() : 'eq';
+                $fields[] = $filter->getField();
+                $conditions[] = [$condition => $filter->getValue()];
+            }
+
+            if ($fields) {
+                $collection->addFieldToFilter($fields, $conditions);
+            }
+        }
+
+        $searchResults->setTotalCount($collection->getSize());
+        $sortOrders = $criteria->getSortOrders();
+
+        if ($sortOrders) {
+            foreach ($sortOrders as $sortOrder) {
+                $collection->addOrder(
+                    $sortOrder->getField(),
+                    ($sortOrder->getDirection() == \Magento\Framework\Api\SortOrder::SORT_ASC) ? 'ASC' : 'DESC'
+                );
+            }
+        }
+
+        $collection->setCurPage($criteria->getCurrentPage());
+        $collection->setPageSize($criteria->getPageSize());
+        $objects = [];
+        foreach ($collection as $objectModel) {
+            $objects[] = $objectModel;
+        }
+        $searchResults->setItems($objects);
+
+        return $searchResults;
+    }
+}

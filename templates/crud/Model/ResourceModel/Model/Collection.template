@@ -1,0 +1,19 @@
+<?php
+/**
+ * Automatically created by MageSpecialist CodeMonkey
+ * https://github.com/magespecialist/m2-MSP_CodeMonkey
+ */
+
+namespace %namespace%;
+
+use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
+
+class %class% extends AbstractCollection
+{
+    protected $_idFieldName = '%primary_key%';
+
+    protected function _construct()
+    {
+        $this->_init('%model%', '%resource_model%');
+    }
+}

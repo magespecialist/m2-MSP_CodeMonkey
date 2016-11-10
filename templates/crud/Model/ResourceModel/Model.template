@@ -1,0 +1,17 @@
+<?php
+/**
+ * Automatically created by MageSpecialist CodeMonkey
+ * https://github.com/magespecialist/m2-MSP_CodeMonkey
+ */
+
+namespace %namespace%;
+
+use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
+
+class %class% extends AbstractDb
+{
+    protected function _construct()
+    {
+        $this->_init('%table%', '%primary_key%');
+    }
+}
