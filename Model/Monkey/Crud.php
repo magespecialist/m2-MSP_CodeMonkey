@@ -183,82 +183,82 @@ class Crud
         $this->filesystem->assertNotExisting($involvedFiles);
         $involvedFiles[] = $this->diManager->getDiFile($moduleName);
 
-//        // Model class
-//        $columns = $this->database->getColumns($tableName);
-//        $classInfo = $this->moduleManager->getClassInfo($modelClassName);
-//        $getterList = [];
-//        $setterList = [];
-//        foreach ($columns as $columnName => $columnInfo) {
-//            $getterList[] = $this->createGetter($dataClassName, $tableName, $columnName, $columnInfo, false);
-//            $setterList[] = $this->createSetter($dataClassName, $tableName, $columnName, $columnInfo, false);
-//        }
-//
-//        $this->template->createFromTemplate('crud/Model/Model', $modelFile, [
-//            'namespace' => $classInfo['namespace'],
-//            'class' => $classInfo['class'],
-//            'interface' => $dataClassName,
-//            'resource_model' => $resourceClassName,
-//            'getter_list' => implode("\n\n", $getterList),
-//            'setter_list' => implode("\n\n", $setterList),
-//        ]);
-//
-//        // Resource class
-//        $classInfo = $this->moduleManager->getClassInfo($resourceClassName);
-//        $primaryKey = $this->database->getPrimaryKey($tableName);
-//        $this->template->createFromTemplate('crud/Model/ResourceModel/Model', $resourceFile, [
-//            'namespace' => $classInfo['namespace'],
-//            'class' => $classInfo['class'],
-//            'table' => $this->database->getTableName($tableName),
-//            'primary_key' => $primaryKey,
-//        ]);
-//
-//        // Collection class
-//        $classInfo = $this->moduleManager->getClassInfo($collectionClassName);
-//        $this->template->createFromTemplate('crud/Model/ResourceModel/Model/Collection', $collectionFile, [
-//            'namespace' => $classInfo['namespace'],
-//            'class' => $classInfo['class'],
-//            'model' => $modelClassName,
-//            'resource_model' => $resourceClassName,
-//            'primary_key' => $primaryKey,
-//        ]);
-//
-//        // Interface
-//        $classInfo = $this->moduleManager->getClassInfo($dataClassName);
-//        $constList = [];
-//        $getterList = [];
-//        $setterList = [];
-//
-//        foreach ($columns as $columnName => $columnInfo) {
-//            $constList[] = "    const ".$this->getConstName($tableName, $columnName)." = '$columnName';";
-//            $getterList[] = $this->createGetter($dataClassName, $tableName, $columnName, $columnInfo, true);
-//            $setterList[] = $this->createSetter($dataClassName, $tableName, $columnName, $columnInfo, true);
-//        }
-//
-//        $this->template->createFromTemplate('crud/Api/Data/Interface', $dataFile, [
-//            'namespace' => $classInfo['namespace'],
-//            'class' => $classInfo['class'],
-//            'const_list' => implode("\n", $constList),
-//            'getter_list' => implode("\n\n", $getterList),
-//            'setter_list' => implode("\n\n", $setterList),
-//        ]);
-//
-//        // Repo file
-//        $classInfo = $this->moduleManager->getClassInfo($repoClassName);
-//        $this->template->createFromTemplate('crud/Model/Repository', $repoFile, [
-//            'namespace' => $classInfo['namespace'],
-//            'class' => $classInfo['class'],
-//            'interface' => $repoIfClassName,
-//            'data_interface' => $dataClassName,
-//            'resource' => $resourceClassName,
-//        ]);
-//
-//        // Repo interface
-//        $classInfo = $this->moduleManager->getClassInfo($repoIfClassName);
-//        $this->template->createFromTemplate('crud/Api/RepositoryInterface', $repoIfFile, [
-//            'namespace' => $classInfo['namespace'],
-//            'class' => $classInfo['class'],
-//            'data_interface' => $dataClassName,
-//        ]);
+        // Model class
+        $columns = $this->database->getColumns($tableName);
+        $classInfo = $this->moduleManager->getClassInfo($modelClassName);
+        $getterList = [];
+        $setterList = [];
+        foreach ($columns as $columnName => $columnInfo) {
+            $getterList[] = $this->createGetter($dataClassName, $tableName, $columnName, $columnInfo, false);
+            $setterList[] = $this->createSetter($dataClassName, $tableName, $columnName, $columnInfo, false);
+        }
+
+        $this->template->createFromTemplate('crud/Model/Model', $modelFile, [
+            'namespace' => $classInfo['namespace'],
+            'class' => $classInfo['class'],
+            'interface' => $dataClassName,
+            'resource_model' => $resourceClassName,
+            'getter_list' => implode("\n\n", $getterList),
+            'setter_list' => implode("\n\n", $setterList),
+        ]);
+
+        // Resource class
+        $classInfo = $this->moduleManager->getClassInfo($resourceClassName);
+        $primaryKey = $this->database->getPrimaryKey($tableName);
+        $this->template->createFromTemplate('crud/Model/ResourceModel/Model', $resourceFile, [
+            'namespace' => $classInfo['namespace'],
+            'class' => $classInfo['class'],
+            'table' => $this->database->getTableName($tableName),
+            'primary_key' => $primaryKey,
+        ]);
+
+        // Collection class
+        $classInfo = $this->moduleManager->getClassInfo($collectionClassName);
+        $this->template->createFromTemplate('crud/Model/ResourceModel/Model/Collection', $collectionFile, [
+            'namespace' => $classInfo['namespace'],
+            'class' => $classInfo['class'],
+            'model' => $modelClassName,
+            'resource_model' => $resourceClassName,
+            'primary_key' => $primaryKey,
+        ]);
+
+        // Interface
+        $classInfo = $this->moduleManager->getClassInfo($dataClassName);
+        $constList = [];
+        $getterList = [];
+        $setterList = [];
+
+        foreach ($columns as $columnName => $columnInfo) {
+            $constList[] = "    const ".$this->getConstName($tableName, $columnName)." = '$columnName';";
+            $getterList[] = $this->createGetter($dataClassName, $tableName, $columnName, $columnInfo, true);
+            $setterList[] = $this->createSetter($dataClassName, $tableName, $columnName, $columnInfo, true);
+        }
+
+        $this->template->createFromTemplate('crud/Api/Data/Interface', $dataFile, [
+            'namespace' => $classInfo['namespace'],
+            'class' => $classInfo['class'],
+            'const_list' => implode("\n", $constList),
+            'getter_list' => implode("\n\n", $getterList),
+            'setter_list' => implode("\n\n", $setterList),
+        ]);
+
+        // Repo file
+        $classInfo = $this->moduleManager->getClassInfo($repoClassName);
+        $this->template->createFromTemplate('crud/Model/Repository', $repoFile, [
+            'namespace' => $classInfo['namespace'],
+            'class' => $classInfo['class'],
+            'interface' => $repoIfClassName,
+            'data_interface' => $dataClassName,
+            'resource' => $resourceClassName,
+        ]);
+
+        // Repo interface
+        $classInfo = $this->moduleManager->getClassInfo($repoIfClassName);
+        $this->template->createFromTemplate('crud/Api/RepositoryInterface', $repoIfFile, [
+            'namespace' => $classInfo['namespace'],
+            'class' => $classInfo['class'],
+            'data_interface' => $dataClassName,
+        ]);
 
         // Inject preferences
         $this->diManager->createPreference($moduleName, $dataClassName, $modelClassName);
