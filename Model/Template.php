@@ -50,12 +50,7 @@ class Template
     {
         $this->filesystem->assertNotExisting($dstFile);
 
-        $sourceFile = $this->moduleManager->getModulePath('MSP_CodeMonkey').'/templates/'.$template.'.template';
-        $sourceFileContent = $this->file->read($sourceFile);
-
-        foreach ($params as $k => $v) {
-            $sourceFileContent = str_replace('%'.$k.'%', $v, $sourceFileContent);
-        }
+        $sourceFileContent = $this->getFromTemplate($template, $params);
 
         $dirName = $this->file->dirname($dstFile);
         if (!$this->file->fileExists($dirName)) {
@@ -63,5 +58,28 @@ class Template
         }
 
         $this->file->write($dstFile, $sourceFileContent);
+    }
+
+    /**
+     * Create file from template
+     * @param $template
+     * @param $params=[]
+     * @throws LocalizedException
+     * @return string
+     */
+    public function getFromTemplate($template, $params=[])
+    {
+        if (!isset($params['header'])) {
+            $params['header'] = $this->getFromTemplate('header', ['header' => '']);
+        }
+
+        $sourceFile = $this->moduleManager->getModulePath('MSP_CodeMonkey').'/templates/'.$template.'.template';
+        $sourceFileContent = $this->file->read($sourceFile);
+
+        foreach ($params as $k => $v) {
+            $sourceFileContent = str_replace('%'.$k.'%', $v, $sourceFileContent);
+        }
+
+        return $sourceFileContent;
     }
 }

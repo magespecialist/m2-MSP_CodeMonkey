@@ -165,6 +165,11 @@ class Crud
         $dataClassName = $this->moduleManager->getClassName($moduleName, 'Api\\Data\\'.$entityName.'Interface');
         $dataFile = $this->moduleManager->getClassFile($moduleName, 'Api\\Data\\'.$entityName.'Interface');
 
+        $searchResultsClassName =
+            $this->moduleManager->getClassName($moduleName, 'Api\\Data\\'.$entityName.'SearchResultsInterface');
+        $searchResultsFile =
+            $this->moduleManager->getClassFile($moduleName, 'Api\\Data\\'.$entityName.'SearchResultsInterface');
+
         $repoIfClassName = $this->moduleManager->getClassName($moduleName, 'Api\\'.$entityName.'RepositoryInterface');
         $repoIfFile = $this->moduleManager->getClassFile($moduleName, 'Api\\'.$entityName.'RepositoryInterface');
 
@@ -178,6 +183,7 @@ class Crud
             $dataFile,
             $repoFile,
             $repoIfFile,
+            $searchResultsFile,
         ];
 
         $this->filesystem->assertNotExisting($involvedFiles);
@@ -247,8 +253,10 @@ class Crud
         $this->template->createFromTemplate('crud/Model/Repository', $repoFile, [
             'namespace' => $classInfo['namespace'],
             'class' => $classInfo['class'],
+            'collection' => $collectionClassName,
             'interface' => $repoIfClassName,
             'data_interface' => $dataClassName,
+            'search_results_interface' => $searchResultsClassName,
             'resource' => $resourceClassName,
         ]);
 
@@ -258,11 +266,25 @@ class Crud
             'namespace' => $classInfo['namespace'],
             'class' => $classInfo['class'],
             'data_interface' => $dataClassName,
+            'search_results_interface' => $searchResultsClassName,
+        ]);
+
+        // Search results interface
+        $classInfo = $this->moduleManager->getClassInfo($searchResultsClassName);
+        $this->template->createFromTemplate('crud/Api/Data/SearchResultInterface', $searchResultsFile, [
+            'namespace' => $classInfo['namespace'],
+            'class' => $classInfo['class'],
+            'data_interface' => $dataClassName,
         ]);
 
         // Inject preferences
         $this->diManager->createPreference($moduleName, $dataClassName, $modelClassName);
         $this->diManager->createPreference($moduleName, $repoIfClassName, $repoClassName);
+        $this->diManager->createPreference(
+            $moduleName,
+            $searchResultsClassName,
+            '\\Magento\\Framework\\Api\\SearchResults'
+        );
 
         return $involvedFiles;
     }

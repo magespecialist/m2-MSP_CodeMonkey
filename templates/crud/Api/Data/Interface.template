@@ -1,8 +1,5 @@
 <?php
-/**
- * Automatically created by MageSpecialist CodeMonkey
- * https://github.com/magespecialist/m2-MSP_CodeMonkey
- */
+%header%
 
 namespace %namespace%;
 

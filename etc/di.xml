@@ -24,7 +24,7 @@
     <type name="Magento\Framework\Console\CommandList">
         <arguments>
             <argument name="commands" xsi:type="array">
-                <item name="msp_codemonkey_crud_create" xsi:type="object">MSP\CodeMonkey\Command\CrudCreate</item>
+                <item name="msp_codemonkey_crud" xsi:type="object">MSP\CodeMonkey\Command\Crud</item>
             </argument>
         </arguments>
     </type>

@@ -1,0 +1,20 @@
+<?php
+%header%
+
+namespace %namespace%;
+
+interface %class% extends \Magento\Framework\Api\SearchResultsInterface
+{
+    /**
+     * Get an array of objects
+     * @return %data_interface%[]
+     */
+    public function getItems();
+
+    /**
+     * Set objects list
+     * @param %data_interface%[] $items
+     * @return $this
+     */
+    public function setItems(array $items);
+}

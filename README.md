@@ -16,7 +16,7 @@ With code monkey you can quickly:
 
 Quick and dirty:
 
-> php bin/magento codemonkey:crud:create My_Module Myentity mydatabasetable
+> php bin/magento codemonkey:crud My_Module Myentity mydatabasetable
 
 In the previous example, CodeMonkey will read `My_Module` configuration and `mydatabasetable` table **from your DB** and will create model triads,
 interfaces and `di.xml` entries according to your configuration.

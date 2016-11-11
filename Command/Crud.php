@@ -20,18 +20,18 @@
 
 namespace MSP\CodeMonkey\Command;
 
-use MSP\CodeMonkey\Model\Monkey\Crud;
+use MSP\CodeMonkey\Model\Monkey\Crud as CrudModel;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CrudCreate extends Command
+class Crud extends Command
 {
     protected $crud;
 
     public function __construct(
-        Crud $crud,
+        CrudModel $crud,
         $name = null
     ) {
         $this->crud = $crud;
@@ -41,7 +41,7 @@ class CrudCreate extends Command
 
     protected function configure()
     {
-        $this->setName('codemonkey:crud:create');
+        $this->setName('codemonkey:crud');
         $this->setDescription('Create model, resource, collection, repo, interface and api for a database entity');
 
         $this->addArgument('module', InputArgument::REQUIRED, __('Module name'));
