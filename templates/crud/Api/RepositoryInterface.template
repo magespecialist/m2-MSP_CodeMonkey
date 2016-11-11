@@ -14,9 +14,10 @@ interface %class%
     /**
      * Get object by id
      * @param int $id
+     * @param $forceReload
      * @return %data_interface%
      */
-    public function getById($id);
+    public function getById($id, $forceReload=false);
 
     /**
      * Delete object

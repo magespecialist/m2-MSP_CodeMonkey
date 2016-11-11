@@ -39,9 +39,9 @@ class %class% implements %interface%
         return $object;
     }
 
-    public function getById($id)
+    public function getById($id, $forceReload=false)
     {
-        if (!isset($this->registry[$id])) {
+        if (!isset($this->registry[$id]) || $forceReload) {
             $object = $this->objectFactory->create();
             $this->objectResource->load($object, $id);
 
