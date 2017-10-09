@@ -1,6 +1,6 @@
 <?php
 /**
- * IDEALIAGroup srl - MageSpecialist
+ * MageSpecialist
  *
  * NOTICE OF LICENSE
  *
@@ -10,11 +10,11 @@
  * http://opensource.org/licenses/osl-3.0.php
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
- * to info@idealiagroup.com so we can send you a copy immediately.
+ * to info@magespecialist.it so we can send you a copy immediately.
  *
  * @category   MSP
  * @package    MSP_CodeMonkey
- * @copyright  Copyright (c) 2016 IDEALIAGroup srl - MageSpecialist (http://www.magespecialist.it)
+ * @copyright  Copyright (c) 2017 Skeeller srl (http://www.magespecialist.it)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -22,7 +22,10 @@ namespace MSP\CodeMonkey\Model;
 
 class DiManager
 {
-    protected $moduleManager;
+    /**
+     * @var ModuleManager
+     */
+    private $moduleManager;
 
     public function __construct(
         ModuleManager $moduleManager
@@ -37,7 +40,7 @@ class DiManager
      */
     public function getDiFile($moduleName)
     {
-        return $this->moduleManager->getModulePath($moduleName).'/etc/di.xml';
+        return $this->moduleManager->getModulePath($moduleName) . '/etc/di.xml';
     }
 
     /**
@@ -50,7 +53,9 @@ class DiManager
     {
         $diFile = $this->getDiFile($moduleName);
 
+        // @codingStandardsIgnoreStart
         $dom = new \DomDocument("1.0", "UTF-8");
+        // @codingStandardsIgnoreEnd
         $dom->formatOutput = true;
         $dom->preserveWhiteSpace = false;
 
@@ -64,10 +69,12 @@ class DiManager
             $dom->appendChild($root);
         }
 
+        // @codingStandardsIgnoreStart
         $xpath = new \DOMXpath($dom);
+        // @codingStandardsIgnoreEnd
 
         $preferences = $xpath->query('//preference');
-        for ($i=0; $i<$preferences->length; $i++) {
+        for ($i = 0; $i < $preferences->length; $i++) {
             $nodeValue = $preferences->item($i)->attributes->getNamedItem('for')->nodeValue;
             if ($nodeValue == $source) {
                 return;

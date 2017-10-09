@@ -1,6 +1,6 @@
 <?php
 /**
- * IDEALIAGroup srl - MageSpecialist
+ * MageSpecialist
  *
  * NOTICE OF LICENSE
  *
@@ -10,11 +10,11 @@
  * http://opensource.org/licenses/osl-3.0.php
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
- * to info@idealiagroup.com so we can send you a copy immediately.
+ * to info@magespecialist.it so we can send you a copy immediately.
  *
  * @category   MSP
  * @package    MSP_CodeMonkey
- * @copyright  Copyright (c) 2016 IDEALIAGroup srl - MageSpecialist (http://www.magespecialist.it)
+ * @copyright  Copyright (c) 2017 Skeeller srl (http://www.magespecialist.it)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -26,7 +26,10 @@ use Magento\Framework\Exception\LocalizedException;
 
 class ModuleManager
 {
-    protected $componentRegistrar;
+    /**
+     * @var ComponentRegistrarInterface
+     */
+    private $componentRegistrar;
 
     public function __construct(
         ComponentRegistrarInterface $componentRegistrar
@@ -44,7 +47,7 @@ class ModuleManager
     {
         $res = $this->componentRegistrar->getPath(ComponentRegistrar::MODULE, $moduleName);
         if (!$res) {
-            throw new LocalizedException(__('Unknown module '.$moduleName));
+            throw new LocalizedException(__('Unknown module ' . $moduleName));
         }
 
         return $res;
@@ -85,7 +88,7 @@ class ModuleManager
      */
     public function getClassName($moduleName, $className)
     {
-        return '\\'.$this->getModuleName($moduleName).'\\'.$this->getRelativeClassName($className);
+        return '\\' . $this->getModuleName($moduleName) . '\\' . $this->getRelativeClassName($className);
     }
 
     /**
@@ -96,8 +99,8 @@ class ModuleManager
      */
     public function getClassFile($moduleName, $className)
     {
-        return $this->getModulePath($moduleName).'/'
-            .str_replace('\\', '/', $this->getRelativeClassName($className)).'.php';
+        return $this->getModulePath($moduleName) . '/'
+            . str_replace('\\', '/', $this->getRelativeClassName($className)) . '.php';
     }
 
     /**
@@ -117,7 +120,29 @@ class ModuleManager
 
         return [
             'namespace' => $namespace,
-            'class' => $className,
+            'class_name' => $className,
         ];
+    }
+
+    /**
+     * Generate classes names and information
+     * @param $moduleName
+     * @param array $classes
+     * @return array
+     */
+    public function generateClasses($moduleName, array $classes)
+    {
+        $res = [];
+
+        foreach ($classes as $code => $class) {
+            $className = $this->getClassName($moduleName, $class);
+            $res[$code] = [
+                'class' => $className,
+                'file' => $this->getClassFile($moduleName, $class),
+                'info' => $this->getClassInfo($className),
+            ];
+        }
+
+        return $res;
     }
 }

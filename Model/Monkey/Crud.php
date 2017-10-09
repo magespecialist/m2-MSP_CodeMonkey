@@ -1,6 +1,6 @@
 <?php
 /**
- * IDEALIAGroup srl - MageSpecialist
+ * MageSpecialist
  *
  * NOTICE OF LICENSE
  *
@@ -10,282 +10,395 @@
  * http://opensource.org/licenses/osl-3.0.php
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
- * to info@idealiagroup.com so we can send you a copy immediately.
+ * to info@magespecialist.it so we can send you a copy immediately.
  *
  * @category   MSP
  * @package    MSP_CodeMonkey
- * @copyright  Copyright (c) 2016 IDEALIAGroup srl - MageSpecialist (http://www.magespecialist.it)
+ * @copyright  Copyright (c) 2017 Skeeller srl (http://www.magespecialist.it)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 namespace MSP\CodeMonkey\Model\Monkey;
 
 use MSP\CodeMonkey\Model\Database;
+use MSP\CodeMonkey\Model\DiManager;
 use MSP\CodeMonkey\Model\Filesystem;
 use MSP\CodeMonkey\Model\ModuleManager;
+use MSP\CodeMonkey\Model\PhpCode;
 use MSP\CodeMonkey\Model\Template;
-use MSP\CodeMonkey\Model\DiManager;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+ * @SuppressWarnings(PHPMD.TooManyFields)
+ */
 class Crud
 {
-    protected $moduleManager;
-    protected $filesystem;
-    protected $template;
-    protected $database;
+    private $moduleName;
+    private $entityName;
+    private $entityVar;
+    private $tableName;
+    private $overwrite;
+    private $primaryKey;
+    private $columns = [];
+    private $indexedColumns = [];
+    private $classes = [];
+    private $outFiles = [];
+
+    /**
+     * @var PhpCode
+     */
+    private $phpCode;
+
+    /**
+     * @var Template
+     */
+    private $template;
+
+    /**
+     * @var ModuleManager
+     */
+    private $moduleManager;
+
+    /**
+     * @var Database
+     */
+    private $database;
+
+    /**
+     * @var Filesystem
+     */
+    private $filesystem;
+
+    /**
+     * @var DiManager
+     */
+    private $diManager;
 
     public function __construct(
+        Template $template,
+        PhpCode $phpCode,
         ModuleManager $moduleManager,
         DiManager $diManager,
+        Database $database,
         Filesystem $filesystem,
-        Template $template,
-        Database $database
+        $moduleName,
+        $entityName,
+        $tableName,
+        $overwrite
     ) {
-        $this->moduleManager = $moduleManager;
-        $this->filesystem = $filesystem;
+        $this->phpCode = $phpCode;
+        $this->moduleName = $moduleName;
+        $this->entityName = $entityName;
+        $this->tableName = $tableName;
         $this->template = $template;
+        $this->moduleManager = $moduleManager;
         $this->database = $database;
+        $this->filesystem = $filesystem;
+        $this->overwrite = $overwrite;
         $this->diManager = $diManager;
     }
 
     /**
-     * Convert to camel case
-     * @param $string
-     * @return mixed
+     * Generate class names
      */
-    protected function toCamelCase($string)
+    private function prepare()
     {
-        return str_replace(' ', '', ucwords(preg_replace('/[^a-zA-Z0-9]+/', ' ', $string)));
+        $this->entityName = $this->phpCode->toCamelCase($this->entityName);
+        $this->entityVar = lcfirst($this->entityName);
+        $this->primaryKey = $this->database->getPrimaryKey($this->tableName);
+        $this->columns = $this->database->getColumns($this->tableName);
+        $indexes = $this->database->getIndexes($this->tableName);
+
+        $this->indexedColumns = [];
+        foreach ($indexes as $info) {
+            foreach ($info['COLUMNS_LIST'] as $indexedColumn) {
+                if ($indexedColumn != $this->primaryKey) {
+                    $this->indexedColumns[] = $indexedColumn;
+                }
+            }
+        }
+
+        $this->classes = $this->moduleManager->generateClasses($this->moduleName, [
+            'model' => 'Model\\' . $this->entityName,
+            'resource' => 'Model\\ResourceModel\\' . $this->entityName,
+            'collection' => 'Model\\ResourceModel\\' . $this->entityName . '\\Collection',
+            'data_model' => 'Model\\Data\\' . $this->entityName,
+            'data_interface' => 'Api\\Data\\' . $this->entityName . 'Interface',
+            'registry' => 'Model\\' . $this->entityName . 'Registry',
+            'repository' => 'Model\\ResourceModel\\' . $this->entityName . 'Repository',
+            'repository_interface' => 'Api\\' . $this->entityName . 'RepositoryInterface',
+            'search_results_interface' => 'Api\\Data\\' . $this->entityName . 'SearchResultsInterface',
+        ]);
     }
 
     /**
-     * Create getter function
-     * @param $interfaceClass
-     * @param $tableName
-     * @param $columnName
-     * @param $columnInfo
-     * @param bool $interface
-     * @return string
+     * Generate model
      */
-    public function createGetter($interfaceClass, $tableName, $columnName, $columnInfo, $interface = false)
+    private function generateModel()
     {
-        $out = [];
-        if ($this->database->isPrimaryKey($tableName, $columnName)) {
-            $methodName = 'getId';
-        } else {
-            $methodName = "get" . $this->toCamelCase($columnName);
-        }
-
-        $constName = $interfaceClass.'::'.$this->getConstName($tableName, $columnName);
-
-        if ($interface) {
-            $out[] = "    /**";
-            $out[] = "     * Get value for $columnName";
-            $out[] = "     * @return " . $this->database->getTypeByColumnType($columnInfo['DATA_TYPE']);
-            $out[] = "     */";
-            $out[] = "    public function $methodName" . "();";
-        } else {
-            $out[] = "    public function $methodName" . "()";
-            $out[] = "    {";
-            $out[] = "        return \$this->getData($constName);";
-            $out[] = "    }";
-        }
-
-        return implode("\n", $out);
+        $this->outFiles['model'] = [
+            'file' => $this->classes['model']['file'],
+            'code' => $this->template->getCodeFromTemplate('crud/Model/Model', [
+                'namespace' => $this->classes['model']['info']['namespace'],
+                'class' => $this->classes['model']['info']['class_name'],
+                'resource' => $this->classes['resource']['class'],
+                'data_interface' => $this->classes['data_interface']['class'],
+                'entity_name' => $this->entityName,
+                'entity_var' => $this->entityVar,
+            ]),
+        ];
     }
 
     /**
-     * Create getter function
-     * @param $interfaceClass
-     * @param $tableName
-     * @param $columnName
-     * @param $columnInfo
-     * @param bool $interface
-     * @return string
+     * Generate resource
      */
-    public function createSetter($interfaceClass, $tableName, $columnName, $columnInfo, $interface = false)
+    private function generateResource()
     {
-        $out = [];
-        if ($this->database->isPrimaryKey($tableName, $columnName)) {
-            $methodName = 'setId';
-        } else {
-            $methodName = "set" . $this->toCamelCase($columnName);
-        }
-
-        $constName = $interfaceClass.'::'.$this->getConstName($tableName, $columnName);
-
-        if ($interface) {
-            $out[] = "    /**";
-            $out[] = "     * Set value for $columnName";
-            $out[] = "     * @param ".$this->database->getTypeByColumnType($columnInfo['DATA_TYPE'])." \$value";
-            $out[] = "     * @return \$this";
-            $out[] = "     */";
-            $out[] = "    public function $methodName"."(\$value);";
-        } else {
-            $out[] = "    public function $methodName"."(\$value)";
-            $out[] = "    {";
-            $out[] = "        \$this->setData($constName, \$value);";
-            $out[] = "        return \$this;";
-            $out[] = "    }";
-        }
-
-        return implode("\n", $out);
+        $this->outFiles['resource'] = [
+            'file' => $this->classes['resource']['file'],
+            'code' => $this->template->getCodeFromTemplate('crud/Model/ResourceModel/Resource', [
+                'namespace' => $this->classes['resource']['info']['namespace'],
+                'class' => $this->classes['resource']['info']['class_name'],
+                'table' => $this->tableName,
+                'primary_key' => $this->primaryKey,
+            ]),
+        ];
     }
 
     /**
-     * Return column const name
-     * @param $tableName
-     * @param $columnName
-     * @return string
+     * Generate collection
      */
-    public function getConstName($tableName, $columnName)
+    private function generateCollection()
     {
-        return $this->database->isPrimaryKey($tableName, $columnName) ? 'ID' : strtoupper($columnName);
+        $this->outFiles['collection'] = [
+            'file' => $this->classes['collection']['file'],
+            'code' => $this->template->getCodeFromTemplate('crud/Model/ResourceModel/Model/Collection', [
+                'namespace' => $this->classes['collection']['info']['namespace'],
+                'class' => $this->classes['collection']['info']['class_name'],
+                'model' => $this->classes['model']['class'],
+                'resource' => $this->classes['resource']['class'],
+                'primary_key' => $this->primaryKey,
+            ]),
+        ];
     }
 
     /**
-     * Create crud model and return a list of created/modified files
-     * @param $moduleName
-     * @param $entityName
-     * @param $tableName
-     * @return string[]
+     * Generate data model
      */
-    public function create($moduleName, $entityName, $tableName)
+    private function generateDataModel()
     {
-        $modelClassName = $this->moduleManager->getClassName($moduleName, 'Model\\'.$entityName);
-        $modelFile = $this->moduleManager->getClassFile($moduleName, 'Model\\'.$entityName);
+        $modelMethodsList = [];
+        $interfaceMethodsList = [];
+        $constList = [];
 
-        $resourceClassName = $this->moduleManager->getClassName($moduleName, 'Model\\ResourceModel\\'.$entityName);
-        $resourceFile = $this->moduleManager->getClassFile($moduleName, 'Model\\ResourceModel\\'.$entityName);
+        foreach ($this->columns as $columnName => $columnInfo) {
+            $constList[] = $this->template->getCodeFromTemplate('crud/Api/Data/Interface.constant', [
+                'field_const' => $columnName == $this->primaryKey ? 'ID' : strtoupper($columnName),
+                'field_name' => $columnName,
+            ]);
 
-        $collectionClassName =
-            $this->moduleManager->getClassName($moduleName, 'Model\\ResourceModel\\'.$entityName.'\\Collection');
-        $collectionFile =
-            $this->moduleManager->getClassFile($moduleName, 'Model\\ResourceModel\\'.$entityName.'\\Collection');
+            $interfaceMethodsList[] = $this->template->getCodeFromTemplate('crud/Api/Data/Interface.methods', [
+                'data_type' => $this->database->getTypeByColumnType($columnInfo['DATA_TYPE']),
+                'data_interface' => $this->classes['data_interface']['class'],
+                'field_name' => $columnName,
+                'fn_name' => $columnName == $this->primaryKey ?
+                    'Id' :
+                    ucfirst($this->phpCode->toCamelCase($columnName)),
+            ]);
 
-        $dataClassName = $this->moduleManager->getClassName($moduleName, 'Api\\Data\\'.$entityName.'Interface');
-        $dataFile = $this->moduleManager->getClassFile($moduleName, 'Api\\Data\\'.$entityName.'Interface');
+            $modelMethodsList[] = $this->template->getCodeFromTemplate('crud/Model/Data/Model.methods', [
+                'data_type' => $this->database->getTypeByColumnType($columnInfo['DATA_TYPE']),
+                'data_interface' => $this->classes['data_interface']['class'],
+                'field_name' => $columnName,
+                'field_const' => $columnName == $this->primaryKey ? 'ID' : strtoupper($columnName),
+                'fn_name' => $columnName == $this->primaryKey ?
+                    'Id' :
+                    ucfirst($this->phpCode->toCamelCase($columnName)),
+            ]);
+        }
 
-        $searchResultsClassName =
-            $this->moduleManager->getClassName($moduleName, 'Api\\Data\\'.$entityName.'SearchResultsInterface');
-        $searchResultsFile =
-            $this->moduleManager->getClassFile($moduleName, 'Api\\Data\\'.$entityName.'SearchResultsInterface');
-
-        $repoIfClassName = $this->moduleManager->getClassName($moduleName, 'Api\\'.$entityName.'RepositoryInterface');
-        $repoIfFile = $this->moduleManager->getClassFile($moduleName, 'Api\\'.$entityName.'RepositoryInterface');
-
-        $repoClassName = $this->moduleManager->getClassName($moduleName, 'Model\\'.$entityName.'Repository');
-        $repoFile = $this->moduleManager->getClassFile($moduleName, 'Model\\'.$entityName.'Repository');
-
-        $involvedFiles = [
-            $modelFile,
-            $resourceFile,
-            $collectionFile,
-            $dataFile,
-            $repoFile,
-            $repoIfFile,
-            $searchResultsFile,
+        $this->outFiles['data_interface'] = [
+            'file' => $this->classes['data_interface']['file'],
+            'code' => $this->template->getCodeFromTemplate('crud/Api/Data/Interface', [
+                'namespace' => $this->classes['data_interface']['info']['namespace'],
+                'class' => $this->classes['data_interface']['info']['class_name'],
+                'data_interface' => $this->classes['data_interface']['class'],
+                'const_list' => implode("\n", $constList),
+                'methods_list' => implode("\n\n", $interfaceMethodsList),
+            ]),
         ];
 
-        $this->filesystem->assertNotExisting($involvedFiles);
-        $involvedFiles[] = $this->diManager->getDiFile($moduleName);
+        $this->outFiles['data_model'] = [
+            'file' => $this->classes['data_model']['file'],
+            'code' => $this->template->getCodeFromTemplate('crud/Model/Data/Model', [
+                'namespace' => $this->classes['data_model']['info']['namespace'],
+                'class' => $this->classes['data_model']['info']['class_name'],
+                'data_interface' => $this->classes['data_interface']['class'],
+                'methods_list' => implode("\n\n", $modelMethodsList),
+            ]),
+        ];
+    }
 
-        // Model class
-        $columns = $this->database->getColumns($tableName);
-        $classInfo = $this->moduleManager->getClassInfo($modelClassName);
-        $getterList = [];
-        $setterList = [];
-        foreach ($columns as $columnName => $columnInfo) {
-            $getterList[] = $this->createGetter($dataClassName, $tableName, $columnName, $columnInfo, false);
-            $setterList[] = $this->createSetter($dataClassName, $tableName, $columnName, $columnInfo, false);
+    /**
+     * Generate entity registry class
+     */
+    private function generateRegistry()
+    {
+        $indexMethodsList = [];
+        $registryIndexByKey = [];
+
+        foreach ($this->indexedColumns as $columnName) {
+            $columnInfo = $this->columns[$columnName];
+
+            $indexMethodsList[] = $this->template->getCodeFromTemplate('crud/Model/Registry.index', [
+                'data_type' => $this->database->getTypeByColumnType($columnInfo['DATA_TYPE']),
+                'column_name' => ucfirst($this->phpCode->toCamelCase($columnName)),
+                'data_interface' => $this->classes['data_interface']['class'],
+                'column_field' => $columnName,
+            ]);
+
+            $registryIndexByKey[] = $this->template->getCodeFromTemplate('crud/Model/Registry.indexbykey', [
+                'column_field' => $columnName,
+            ]);
         }
 
-        $this->template->createFromTemplate('crud/Model/Model', $modelFile, [
-            'namespace' => $classInfo['namespace'],
-            'class' => $classInfo['class'],
-            'interface' => $dataClassName,
-            'resource_model' => $resourceClassName,
-            'getter_list' => implode("\n\n", $getterList),
-            'setter_list' => implode("\n\n", $setterList),
-        ]);
+        $this->outFiles['registry'] = [
+            'file' => $this->classes['registry']['file'],
+            'code' => $this->template->getCodeFromTemplate('crud/Model/Registry', [
+                'namespace' => $this->classes['registry']['info']['namespace'],
+                'class' => $this->classes['registry']['info']['class_name'],
+                'entity_var' => $this->entityVar,
+                'model' => $this->classes['model']['class'],
+                'data_interface' => $this->classes['data_interface']['class'],
+                'index_methods' => !empty($indexMethodsList) ? "\n" . implode("\n\n", $indexMethodsList) . "\n" : '',
+                'registry_index_by_key' => implode("\n", $registryIndexByKey),
+            ]),
+        ];
+    }
 
-        // Resource class
-        $classInfo = $this->moduleManager->getClassInfo($resourceClassName);
-        $primaryKey = $this->database->getPrimaryKey($tableName);
-        $this->template->createFromTemplate('crud/Model/ResourceModel/Model', $resourceFile, [
-            'namespace' => $classInfo['namespace'],
-            'class' => $classInfo['class'],
-            'table' => $this->database->getTableName($tableName),
-            'primary_key' => $primaryKey,
-        ]);
+    /**
+     * Generate search result interface
+     */
+    private function generateSearchResultInterface()
+    {
+        $this->outFiles['search_results_interface'] = [
+            'file' => $this->classes['search_results_interface']['file'],
+            'code' => $this->template->getCodeFromTemplate('crud/Api/Data/SearchResultInterface', [
+                'namespace' => $this->classes['search_results_interface']['info']['namespace'],
+                'class' => $this->classes['search_results_interface']['info']['class_name'],
+                'data_interface' => $this->classes['data_interface']['class'],
+            ]),
+        ];
+    }
 
-        // Collection class
-        $classInfo = $this->moduleManager->getClassInfo($collectionClassName);
-        $this->template->createFromTemplate('crud/Model/ResourceModel/Model/Collection', $collectionFile, [
-            'namespace' => $classInfo['namespace'],
-            'class' => $classInfo['class'],
-            'model' => $modelClassName,
-            'resource_model' => $resourceClassName,
-            'primary_key' => $primaryKey,
-        ]);
+    /**
+     * Generate repository class
+     */
+    private function generateRepository()
+    {
+        $idxMthRepoList = [];
+        $idxMthIfaceList = [];
 
-        // Interface
-        $classInfo = $this->moduleManager->getClassInfo($dataClassName);
-        $constList = [];
-        $getterList = [];
-        $setterList = [];
+        foreach ($this->indexedColumns as $columnName) {
+            $columnInfo = $this->columns[$columnName];
 
-        foreach ($columns as $columnName => $columnInfo) {
-            $constList[] = "    const ".$this->getConstName($tableName, $columnName)." = '$columnName';";
-            $getterList[] = $this->createGetter($dataClassName, $tableName, $columnName, $columnInfo, true);
-            $setterList[] = $this->createSetter($dataClassName, $tableName, $columnName, $columnInfo, true);
+            $idxMthRepoList[] = $this->template->getCodeFromTemplate('crud/Model/ResourceModel/Repository.index', [
+                'column_name' => ucfirst($this->phpCode->toCamelCase($columnName)),
+                'column_field' => $columnName,
+                'entity_var' => $this->entityVar,
+                'entity_name' => $this->entityName,
+            ]);
+
+            $idxMthIfaceList[] = $this->template->getCodeFromTemplate('crud/Api/RepositoryInterface.index', [
+                'data_type' => $this->database->getTypeByColumnType($columnInfo['DATA_TYPE']),
+                'data_interface' => $this->classes['data_interface']['class'],
+                'column_name' => ucfirst($this->phpCode->toCamelCase($columnName)),
+            ]);
         }
 
-        $this->template->createFromTemplate('crud/Api/Data/Interface', $dataFile, [
-            'namespace' => $classInfo['namespace'],
-            'class' => $classInfo['class'],
-            'const_list' => implode("\n", $constList),
-            'getter_list' => implode("\n\n", $getterList),
-            'setter_list' => implode("\n\n", $setterList),
-        ]);
+        $this->outFiles['repository_interface'] = [
+            'file' => $this->classes['repository_interface']['file'],
+            'code' => $this->template->getCodeFromTemplate('crud/Api/RepositoryInterface', [
+                'namespace' => $this->classes['repository_interface']['info']['namespace'],
+                'class' => $this->classes['repository_interface']['info']['class_name'],
+                'data_interface' => $this->classes['data_interface']['class'],
+                'search_results_interface' => $this->classes['search_results_interface']['class'],
+                'index_methods' => !empty($idxMthRepoList) ? "\n" . implode("\n\n", $idxMthIfaceList) . "\n" : '',
+            ]),
+        ];
 
-        // Repo file
-        $classInfo = $this->moduleManager->getClassInfo($repoClassName);
-        $this->template->createFromTemplate('crud/Model/Repository', $repoFile, [
-            'namespace' => $classInfo['namespace'],
-            'class' => $classInfo['class'],
-            'collection' => $collectionClassName,
-            'interface' => $repoIfClassName,
-            'data_interface' => $dataClassName,
-            'search_results_interface' => $searchResultsClassName,
-            'resource' => $resourceClassName,
-        ]);
+        $this->outFiles['repository'] = [
+            'file' => $this->classes['repository']['file'],
+            'code' => $this->template->getCodeFromTemplate('crud/Model/ResourceModel/Repository', [
+                'namespace' => $this->classes['repository']['info']['namespace'],
+                'interface' => $this->classes['repository_interface']['class'],
+                'model' => $this->classes['model']['class'],
+                'class' => $this->classes['repository']['info']['class_name'],
+                'data_interface' => $this->classes['data_interface']['class'],
+                'collection' => $this->classes['collection']['class'],
+                'search_results_interface' => $this->classes['search_results_interface']['class'],
+                'entity_var' => $this->entityVar,
+                'entity_name' => $this->entityName,
+                'registry' => $this->classes['registry']['class'],
+                'resource' => $this->classes['resource']['class'],
+                'index_methods' => !empty($idxMthRepoList) ? "\n" . implode("\n\n", $idxMthRepoList) . "\n" : '',
+            ]),
+        ];
+    }
 
-        // Repo interface
-        $classInfo = $this->moduleManager->getClassInfo($repoIfClassName);
-        $this->template->createFromTemplate('crud/Api/RepositoryInterface', $repoIfFile, [
-            'namespace' => $classInfo['namespace'],
-            'class' => $classInfo['class'],
-            'data_interface' => $dataClassName,
-            'search_results_interface' => $searchResultsClassName,
-        ]);
-
-        // Search results interface
-        $classInfo = $this->moduleManager->getClassInfo($searchResultsClassName);
-        $this->template->createFromTemplate('crud/Api/Data/SearchResultInterface', $searchResultsFile, [
-            'namespace' => $classInfo['namespace'],
-            'class' => $classInfo['class'],
-            'data_interface' => $dataClassName,
-        ]);
-
-        // Inject preferences
-        $this->diManager->createPreference($moduleName, $dataClassName, $modelClassName);
-        $this->diManager->createPreference($moduleName, $repoIfClassName, $repoClassName);
+    /**
+     * Inject DI preferences
+     */
+    private function injectDi()
+    {
         $this->diManager->createPreference(
-            $moduleName,
-            $searchResultsClassName,
+            $this->moduleName,
+            $this->classes['data_interface']['class'],
+            $this->classes['data_model']['class']
+        );
+        $this->diManager->createPreference(
+            $this->moduleName,
+            $this->classes['repository_interface']['class'],
+            $this->classes['repository']['class']
+        );
+        $this->diManager->createPreference(
+            $this->moduleName,
+            $this->classes['search_results_interface']['class'],
             '\\Magento\\Framework\\Api\\SearchResults'
         );
+    }
 
-        return $involvedFiles;
+    /**
+     * Create CRUD model and return a list of modified files
+     * @return array
+     */
+    public function generateCode()
+    {
+        $this->prepare();
+
+        $this->generateModel();
+        $this->generateDataModel();
+        $this->generateResource();
+        $this->generateCollection();
+        $this->generateRegistry();
+        $this->generateSearchResultInterface();
+        $this->generateRepository();
+
+        $outFilesNames = [];
+        foreach ($this->outFiles as $outFile) {
+            $outFilesNames[] = $outFile['file'];
+        }
+
+        if (!$this->overwrite) {
+            $this->filesystem->assertNotExisting($outFilesNames);
+        }
+
+        foreach ($this->outFiles as $outFile) {
+            $this->filesystem->writeFile($outFile['file'], $outFile['code']);
+        }
+
+        $this->injectDi();
+
+        return $outFilesNames;
     }
 }

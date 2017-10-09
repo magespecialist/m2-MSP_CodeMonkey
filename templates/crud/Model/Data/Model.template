@@ -1,0 +1,29 @@
+<?php
+%header%
+
+namespace %namespace%;
+
+use Magento\Framework\Api\AbstractExtensibleObject;
+
+class %class% extends AbstractExtensibleObject implements
+    %data_interface%
+{
+%methods_list%
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getExtensionAttributes()
+    {
+        return $this->_get(self::EXTENSION_ATTRIBUTES_KEY);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setExtensionAttributes(
+        %data_interface%ExtensionInterface $extensionAttributes
+    ) {
+        return $this->setData(self::EXTENSION_ATTRIBUTES_KEY, $extensionAttributes);
+    }
+}

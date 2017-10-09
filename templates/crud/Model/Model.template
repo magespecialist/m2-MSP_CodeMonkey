@@ -4,15 +4,65 @@
 namespace %namespace%;
 
 use Magento\Framework\Model\AbstractModel;
+use Magento\Framework\Api\DataObjectHelper;
+use Magento\Framework\Data\Collection\AbstractDb;
+use Magento\Framework\Model\Context;
+use Magento\Framework\Model\ResourceModel\AbstractResource;
+use Magento\Framework\Registry;
 
-class %class% extends AbstractModel implements %interface%
+/**
+ * @SuppressWarnings(PHPMD.LongVariable)
+ */
+class %class% extends AbstractModel
 {
-    protected function _construct()
-    {
-        $this->_init('%resource_model%');
+    /**
+     * @var DataObjectHelper
+     */
+    private $dataObjectHelper;
+
+    /**
+     * @var %data_interface%Factory
+     */
+    private $%entity_var%DataFactory;
+
+    public function __construct(
+        Context $context,
+        Registry $registry,
+        DataObjectHelper $dataObjectHelper,
+        %data_interface%Factory $%entity_var%DataFactory,
+        AbstractResource $resource = null,
+        AbstractDb $resourceCollection = null,
+        array $data = []
+    ) {
+        parent::__construct($context, $registry, $resource, $resourceCollection, $data);
+        $this->dataObjectHelper = $dataObjectHelper;
+        $this->%entity_var%DataFactory = $%entity_var%DataFactory;
     }
 
-%getter_list%
+    protected function _construct()
+    {
+        $this->_init(%resource%::class);
+    }
 
-%setter_list%
+    /**
+     * Retrieve %entity_name% model
+     *
+     * @return %data_interface%
+     */
+    public function getDataModel()
+    {
+        $%entity_var%Data = $this->getData();
+
+        /** @var %data_interface% $%entity_var%DataObject */
+        $%entity_var%DataObject = $this->%entity_var%DataFactory->create();
+
+        $this->dataObjectHelper->populateWithArray(
+            $%entity_var%DataObject,
+            $%entity_var%Data,
+            %data_interface%::class
+        );
+        $%entity_var%DataObject->setId($this->getId());
+
+        return $%entity_var%DataObject;
+    }
 }

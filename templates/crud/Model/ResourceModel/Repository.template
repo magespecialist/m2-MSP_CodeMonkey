@@ -1,0 +1,206 @@
+<?php
+%header%
+
+namespace %namespace%;
+
+use Magento\Framework\Api\ExtensibleDataObjectConverter;
+
+/**
+ * @SuppressWarnings(PHPMD.ShortVariable)
+ * @SuppressWarnings(PHPMD.LongVariable)
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
+class %class% implements %interface%
+{
+    /**
+     * @var  %data_interface%Factory
+     */
+    private $%entity_var%Factory;
+
+    /**
+     * @var %resource%
+     */
+    private $resource;
+
+    /**
+     * @var %collection%Factory
+     */
+    private $collectionFactory;
+
+    /**
+     * @var %search_results_interface%Factory
+     */
+    private $searchResultsFactory;
+
+    /**
+     * @var %registry%
+     */
+    private $registry;
+
+    /**
+     * @var ExtensibleDataObjectConverter
+     */
+    private $extensibleDataObjectConverter;
+
+    public function __construct(
+        %model%Factory $%entity_var%Factory,
+        %resource% $resource,
+        %collection%Factory $collectionFactory,
+        %search_results_interface%Factory $searchResultsFactory,
+        %registry% $registry,
+        ExtensibleDataObjectConverter $extensibleDataObjectConverter
+    ) {
+        $this->searchResultsFactory = $searchResultsFactory;
+        $this->%entity_var%Factory = $%entity_var%Factory;
+        $this->resource = $resource;
+        $this->registry = $registry;
+        $this->collectionFactory = $collectionFactory;
+        $this->extensibleDataObjectConverter = $extensibleDataObjectConverter;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function save(%data_interface% $%entity_var%)
+    {
+        $%entity_var%Data = $this->extensibleDataObjectConverter->toNestedArray(
+            $%entity_var%,
+            [],
+            %data_interface%::class
+        );
+
+        /** @var %model% $%entity_var%Model */
+        $%entity_var%Model = $this->%entity_var%Factory->create(['data' => $%entity_var%Data]);
+        $%entity_var%Model->setDataChanges(true);
+        $this->resource->save($%entity_var%Model);
+        $%entity_var%->setId($%entity_var%Model->getId());
+
+        $this->registry->push($%entity_var%Model);
+
+        return $this->getById($%entity_var%Model->getId());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getById($id)
+    {
+        $fromRegistry = $this->registry->retrieveById($id);
+        if ($fromRegistry === null) {
+            $%entity_var% = $this->%entity_var%Factory->create();
+            $this->resource->load($%entity_var%, $id);
+
+            if (!$%entity_var%->getId()) {
+                throw new \Magento\Framework\Exception\NoSuchEntityException(__('No such %entity_name%'));
+            }
+
+            $this->registry->push($%entity_var%);
+        }
+
+        return $this->registry->retrieveById($id);
+    }
+%index_methods%
+    /**
+     * {@inheritdoc}
+     */
+    public function delete(%data_interface% $%entity_var%)
+    {
+        $%entity_var%Data = $this->extensibleDataObjectConverter->toNestedArray(
+            $%entity_var%,
+            [],
+            %data_interface%::class
+        );
+
+        /** @var %model% $%entity_var%Model */
+        $%entity_var%Model = $this->%entity_var%Factory->create(['data' => $%entity_var%Data]);
+
+        $this->resource->delete($%entity_var%Model);
+        $this->registry->removeById($%entity_var%Model->getId());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getList(\Magento\Framework\Api\SearchCriteriaInterface $searchCriteria)
+    {
+        /** @var %search_results_interface% $searchResults */
+        $searchResults = $this->searchResultsFactory->create();
+        $searchResults->setSearchCriteria($searchCriteria);
+
+        /** @var %collection% $collection */
+        $collection = $this->%entity_var%Factory->create()->getCollection();
+        $this->applySearchCriteriaToCollection($searchCriteria, $collection);
+
+        $items = $this->convertCollectionToDataItemsArray($collection);
+        $searchResults->setTotalCount($collection->getSize());
+        $searchResults->setItems($items);
+
+        return $searchResults;
+    }
+
+    private function addFilterGroupToCollection(
+        \Magento\Framework\Api\Search\FilterGroup $filterGroup,
+        %collection% $collection
+    ) {
+        $fields = [];
+        $conditions = [];
+        foreach ($filterGroup->getFilters() as $filter) {
+            $condition = $filter->getConditionType() ?: 'eq';
+            $fields[] = $filter->getField();
+
+            $conditions[] = [$condition => $filter->getValue()];
+        }
+
+        if ($fields) {
+            $collection->addFieldToFilter($fields, $conditions);
+        }
+    }
+
+    private function convertCollectionToDataItemsArray(%collection% $collection)
+    {
+        $vendors = array_map(function (%model% $item) {
+            return $item->getDataModel();
+        }, $collection->getItems());
+
+        return $vendors;
+    }
+
+    private function applySearchCriteriaToCollection(
+        \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria,
+        %collection% $collection
+    ) {
+        $this->applySearchCriteriaFiltersToCollection($searchCriteria, $collection);
+        $this->applySearchCriteriaSortOrdersToCollection($searchCriteria, $collection);
+        $this->applySearchCriteriaPagingToCollection($searchCriteria, $collection);
+    }
+
+    private function applySearchCriteriaFiltersToCollection(
+        \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria,
+        %collection% $collection
+    ) {
+        foreach ($searchCriteria->getFilterGroups() as $group) {
+            $this->addFilterGroupToCollection($group, $collection);
+        }
+    }
+
+    private function applySearchCriteriaSortOrdersToCollection(
+        \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria,
+        %collection% $collection
+    ) {
+        $sortOrders = $searchCriteria->getSortOrders();
+        if ($sortOrders) {
+            foreach ($sortOrders as $sortOrder) {
+                $isAscending = $sortOrder->getDirection() == \Magento\Framework\Api\SortOrder::SORT_ASC;
+                $collection->addOrder($sortOrder->getField(), $isAscending ? 'ASC' : 'DESC');
+            }
+        }
+    }
+
+    private function applySearchCriteriaPagingToCollection(
+        \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria,
+        %collection% $collection
+    ) {
+        $collection->setCurPage($searchCriteria->getCurrentPage());
+        $collection->setPageSize($searchCriteria->getPageSize());
+    }
+}

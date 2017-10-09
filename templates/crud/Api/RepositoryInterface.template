@@ -3,6 +3,9 @@
 
 namespace %namespace%;
 
+/**
+ * @SuppressWarnings(PHPMD.ShortVariable)
+ */
 interface %class%
 {
     /**
@@ -15,24 +18,16 @@ interface %class%
     /**
      * Get object by id
      * @param int $id
-     * @param $forceReload
      * @return %data_interface%
      */
-    public function getById($id, $forceReload=false);
-
+    public function getById($id);
+%index_methods%
     /**
      * Delete object
      * @param %data_interface% $object
      * @return void
      */
     public function delete(%data_interface% $object);
-
-    /**
-     * Delete object by id
-     * @param $id
-     * @return void
-     */
-    public function deleteById($id);
 
     /**
      * Get a list of object

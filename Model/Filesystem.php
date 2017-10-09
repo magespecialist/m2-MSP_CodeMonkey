@@ -1,6 +1,6 @@
 <?php
 /**
- * IDEALIAGroup srl - MageSpecialist
+ * MageSpecialist
  *
  * NOTICE OF LICENSE
  *
@@ -10,11 +10,11 @@
  * http://opensource.org/licenses/osl-3.0.php
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
- * to info@idealiagroup.com so we can send you a copy immediately.
+ * to info@magespecialist.it so we can send you a copy immediately.
  *
  * @category   MSP
  * @package    MSP_CodeMonkey
- * @copyright  Copyright (c) 2016 IDEALIAGroup srl - MageSpecialist (http://www.magespecialist.it)
+ * @copyright  Copyright (c) 2017 Skeeller srl (http://www.magespecialist.it)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -25,7 +25,10 @@ use Magento\Framework\Filesystem\Io\File;
 
 class Filesystem
 {
-    protected $file;
+    /**
+     * @var File
+     */
+    private $file;
 
     public function __construct(
         File $file
@@ -35,7 +38,7 @@ class Filesystem
 
     /**
      * Throws an exception if a file already exists
-     * @param $files
+     * @param array|string $files
      * @return bool
      * @throws LocalizedException
      */
@@ -52,5 +55,20 @@ class Filesystem
         }
 
         return true;
+    }
+
+    /**
+     * Write file to disk and recursively create path
+     * @param string $file
+     * @param string $content
+     */
+    public function writeFile($file, $content)
+    {
+        $dirName = $this->file->dirname($file);
+        if (!$this->file->fileExists($dirName)) {
+            $this->file->mkdir($dirName, 0750, true);
+        }
+
+        $this->file->write($file, $content);
     }
 }

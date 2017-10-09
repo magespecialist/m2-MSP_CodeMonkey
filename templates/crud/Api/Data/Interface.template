@@ -3,11 +3,26 @@
 
 namespace %namespace%;
 
-interface %class%
+use Magento\Framework\Api\ExtensibleDataInterface;
+
+interface %class% extends ExtensibleDataInterface
 {
 %const_list%
 
-%getter_list%
+%methods_list%
 
-%setter_list%
+    /**
+     * Retrieve existing extension attributes object or create a new one
+     * @return %data_interface%ExtensionInterface|null
+     */
+    public function getExtensionAttributes();
+
+    /**
+     * Set an extension attributes object
+     * @param %data_interface%ExtensionInterface $extensionAttributes
+     * @return $this
+     */
+    public function setExtensionAttributes(
+        %data_interface%ExtensionInterface $extensionAttributes
+    );
 }

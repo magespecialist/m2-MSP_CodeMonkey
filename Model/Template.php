@@ -1,6 +1,6 @@
 <?php
 /**
- * IDEALIAGroup srl - MageSpecialist
+ * MageSpecialist
  *
  * NOTICE OF LICENSE
  *
@@ -10,11 +10,11 @@
  * http://opensource.org/licenses/osl-3.0.php
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
- * to info@idealiagroup.com so we can send you a copy immediately.
+ * to info@magespecialist.it so we can send you a copy immediately.
  *
  * @category   MSP
  * @package    MSP_CodeMonkey
- * @copyright  Copyright (c) 2016 IDEALIAGroup srl - MageSpecialist (http://www.magespecialist.it)
+ * @copyright  Copyright (c) 2017 Skeeller srl (http://www.magespecialist.it)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -25,59 +25,42 @@ use Magento\Framework\Filesystem\Io\File;
 
 class Template
 {
-    protected $filesystem;
-    protected $moduleManager;
-    protected $file;
+    /**
+     * @var File
+     */
+    private $file;
+
+    /**
+     * @var ModuleManager
+     */
+    private $moduleManager;
 
     public function __construct(
-        Filesystem $filesystem,
         File $file,
         ModuleManager $moduleManager
     ) {
-        $this->filesystem = $filesystem;
-        $this->moduleManager = $moduleManager;
         $this->file = $file;
+        $this->moduleManager = $moduleManager;
     }
 
     /**
      * Create file from template
      * @param $template
-     * @param $dstFile
-     * @param $params=[]
-     * @throws LocalizedException
-     */
-    public function createFromTemplate($template, $dstFile, $params=[])
-    {
-        $this->filesystem->assertNotExisting($dstFile);
-
-        $sourceFileContent = $this->getFromTemplate($template, $params);
-
-        $dirName = $this->file->dirname($dstFile);
-        if (!$this->file->fileExists($dirName)) {
-            $this->file->mkdir($dirName, 0750, true);
-        }
-
-        $this->file->write($dstFile, $sourceFileContent);
-    }
-
-    /**
-     * Create file from template
-     * @param $template
-     * @param $params=[]
+     * @param $params =[]
      * @throws LocalizedException
      * @return string
      */
-    public function getFromTemplate($template, $params=[])
+    public function getCodeFromTemplate($template, $params = [])
     {
         if (!isset($params['header'])) {
-            $params['header'] = $this->getFromTemplate('header', ['header' => '']);
+            $params['header'] = $this->getCodeFromTemplate('header', ['header' => '']);
         }
 
-        $sourceFile = $this->moduleManager->getModulePath('MSP_CodeMonkey').'/templates/'.$template.'.template';
+        $sourceFile = $this->moduleManager->getModulePath('MSP_CodeMonkey') . '/templates/' . $template . '.template';
         $sourceFileContent = $this->file->read($sourceFile);
 
         foreach ($params as $k => $v) {
-            $sourceFileContent = str_replace('%'.$k.'%', $v, $sourceFileContent);
+            $sourceFileContent = str_replace('%' . $k . '%', $v, $sourceFileContent);
         }
 
         return $sourceFileContent;

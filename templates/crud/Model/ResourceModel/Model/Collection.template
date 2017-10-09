@@ -11,6 +11,9 @@ class %class% extends AbstractCollection
 
     protected function _construct()
     {
-        $this->_init('%model%', '%resource_model%');
+        $this->_init(
+            %model%::class,
+            %resource%::class
+        );
     }
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * IDEALIAGroup srl - MageSpecialist
+ * MageSpecialist
  *
  * NOTICE OF LICENSE
  *
@@ -10,11 +10,11 @@
  * http://opensource.org/licenses/osl-3.0.php
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
- * to info@idealiagroup.com so we can send you a copy immediately.
+ * to info@magespecialist.it so we can send you a copy immediately.
  *
  * @category   MSP
  * @package    MSP_CodeMonkey
- * @copyright  Copyright (c) 2016 IDEALIAGroup srl - MageSpecialist (http://www.magespecialist.it)
+ * @copyright  Copyright (c) 2017 Skeeller srl (http://www.magespecialist.it)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -31,7 +31,7 @@ class Database extends AbstractDb
 
     /**
      * Get real table name
-     * @param $tableName
+     * @param string $tableName
      * @return string
      */
     public function getTableName($tableName)
@@ -41,7 +41,7 @@ class Database extends AbstractDb
 
     /**
      * Get primary key field name
-     * @param $tableName
+     * @param string $tableName
      * @return string
      * @throws LocalizedException
      */
@@ -53,7 +53,7 @@ class Database extends AbstractDb
 
     /**
      * Get a list of columns information
-     * @param $tableName
+     * @param string $tableName
      * @return array
      */
     public function getColumns($tableName)
@@ -63,14 +63,24 @@ class Database extends AbstractDb
     }
 
     /**
+     * Get a list of indexes
+     * @param string $tableName
+     * @return array
+     */
+    public function getIndexes($tableName)
+    {
+        $tableName = $this->getTableName($tableName);
+        return $this->getConnection()->getIndexList($tableName);
+    }
+
+    /**
      * get PHP type by SQL data type
-     * @param $type
+     * @param string $type
      * @return string
      */
     public function getTypeByColumnType($type)
     {
-        switch (strtolower($type))
-        {
+        switch (strtolower($type)) {
             case 'int':
                 return 'int';
 
@@ -80,16 +90,5 @@ class Database extends AbstractDb
         }
 
         return 'string';
-    }
-
-    /**
-     * Return true if column is a primary key
-     * @param $tableName
-     * @param $columnName
-     * @return bool
-     */
-    public function isPrimaryKey($tableName, $columnName)
-    {
-        return $this->getPrimaryKey($tableName) == $columnName;
     }
 }

@@ -1,0 +1,70 @@
+<?php
+%header%
+
+namespace %namespace%;
+
+/**
+ * @SuppressWarnings(PHPMD.ShortVariable)
+ */
+class %class%
+{
+    private $registry = [];
+    private $registryByKey = [
+%registry_index_by_key%
+    ];
+
+    /**
+     * @var %model%Factory
+     */
+    private $%entity_var%Factory;
+
+    public function __construct(
+        %model%Factory $%entity_var%Factory
+    ) {
+        $this->%entity_var%Factory = $%entity_var%Factory;
+    }
+    
+    /**
+     * Remove registry entity by id
+     * @param int $id
+     */
+    public function removeById($id)
+    {
+        if (isset($this->registry[$id])) {
+            unset($this->registry[$id]);
+        }
+
+        foreach (array_keys($this->registryByKey) as $key) {
+            $reverseMap = array_flip($this->registryByKey[$key]);
+            if (isset($reverseMap[$id])) {
+                unset($this->registryByKey[$key][$reverseMap[$id]]);
+            }
+        }
+    }
+
+    /**
+     * Push one object into registry
+     * @param int $id
+     * @return %data_interface%|null
+     */
+    public function retrieveById($id)
+    {
+        if (isset($this->registry[$id])) {
+            return $this->registry[$id];
+        }
+
+        return null;
+    }
+%index_methods%
+    /**
+     * Push one object into registry
+     * @param %model% $%entity_var%
+     */
+    public function push(\MSP\Test\Model\ProvaEntity $%entity_var%)
+    {
+        $this->registry[$%entity_var%->getId()] = $%entity_var%->getDataModel();
+        foreach (array_keys($this->registryByKey) as $key) {
+            $this->registryByKey[$key][$%entity_var%->getData($key)] = $%entity_var%->getId();
+        }
+    }
+}
