@@ -60,7 +60,7 @@ class %class%
      * Push one object into registry
      * @param %model% $%entity_var%
      */
-    public function push(\MSP\Test\Model\ProvaEntity $%entity_var%)
+    public function push(%model% $%entity_var%)
     {
         $this->registry[$%entity_var%->getId()] = $%entity_var%->getDataModel();
         foreach (array_keys($this->registryByKey) as $key) {

@@ -5,8 +5,8 @@
     {
         $fromRegistry = $this->registry->retrieveBy%column_name%($value);
         if ($fromRegistry === null) {
-            $%entity_var% = $this->provaEntityFactory->create();
-            $this->resource->load($provaEntity, $value, '%column_field%');
+            $%entity_var% = $this->%entity_var%Factory->create();
+            $this->resource->load($%entity_var%, $value, '%column_field%');
 
             if (!$%entity_var%->getId()) {
                 throw new \Magento\Framework\Exception\NoSuchEntityException(__('No such %entity_name%'));
