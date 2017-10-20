@@ -11,7 +11,7 @@ interface %class%
     /**
      * Save object
      * @param %data_interface% $object
-     * @return void
+     * @return %data_interface%
      */
     public function save(%data_interface% $object);
 
