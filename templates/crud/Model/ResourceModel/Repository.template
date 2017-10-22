@@ -114,8 +114,12 @@ class %class% implements %interface%
         /** @var %model% $%entity_var%Model */
         $%entity_var%Model = $this->%entity_var%Factory->create(['data' => $%entity_var%Data]);
 
+        $%entity_var%Model->setData($this->resource->getIdFieldName(), $%entity_var%->getId());
+
         $this->resource->delete($%entity_var%Model);
         $this->registry->removeById($%entity_var%Model->getId());
+
+        return true;
     }
 
     /**

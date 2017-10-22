@@ -25,7 +25,7 @@ interface %class%
     /**
      * Delete object
      * @param %data_interface% $object
-     * @return void
+     * @return boolean
      */
     public function delete(%data_interface% $object);
 
