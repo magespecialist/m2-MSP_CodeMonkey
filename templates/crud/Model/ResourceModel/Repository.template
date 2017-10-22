@@ -160,8 +160,9 @@ class %class% implements %interface%
         }
     }
 
-    private function convertCollectionToDataItemsArray(%collection% $collection)
-    {
+    private function convertCollectionToDataItemsArray(
+        %collection% $collection
+    ) {
         $vendors = array_map(function (%model% $item) {
             return $item->getDataModel();
         }, $collection->getItems());

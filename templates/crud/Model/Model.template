@@ -12,6 +12,7 @@ use Magento\Framework\Registry;
 
 /**
  * @SuppressWarnings(PHPMD.LongVariable)
+ * @SuppressWarnings(PHPMD.CamelCaseMethodName)
  */
 class %class% extends AbstractModel
 {
