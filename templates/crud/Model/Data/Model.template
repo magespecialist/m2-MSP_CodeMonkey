@@ -22,7 +22,7 @@ class %class% extends AbstractExtensibleObject implements
      * {@inheritdoc}
      */
     public function setExtensionAttributes(
-        %data_interface%ExtensionInterface $extensionAttributes
+        %extension_interface% $extensionAttributes
     ) {
         return $this->setData(self::EXTENSION_ATTRIBUTES_KEY, $extensionAttributes);
     }

@@ -13,16 +13,16 @@ interface %class% extends ExtensibleDataInterface
 
     /**
      * Retrieve existing extension attributes object or create a new one
-     * @return %data_interface%ExtensionInterface|null
+     * @return %extension_interface%|null
      */
     public function getExtensionAttributes();
 
     /**
      * Set an extension attributes object
-     * @param %data_interface%ExtensionInterface $extensionAttributes
+     * @param %extension_interface% $extensionAttributes
      * @return $this
      */
     public function setExtensionAttributes(
-        %data_interface%ExtensionInterface $extensionAttributes
+        %extension_interface% $extensionAttributes
     );
 }

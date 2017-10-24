@@ -217,12 +217,19 @@ class Crud
             ]);
         }
 
+        $extensionInterface = preg_replace(
+            '/Interface$/',
+            'ExtensionInterface',
+            $this->classes['data_interface']['class']
+        );
+
         $this->outFiles['data_interface'] = [
             'file' => $this->classes['data_interface']['file'],
             'code' => $this->template->getCodeFromTemplate('crud/Api/Data/Interface', [
                 'namespace' => $this->classes['data_interface']['info']['namespace'],
                 'class' => $this->classes['data_interface']['info']['class_name'],
                 'data_interface' => $this->classes['data_interface']['class'],
+                'extension_interface' => $extensionInterface,
                 'const_list' => implode("\n", $constList),
                 'methods_list' => implode("\n\n", $interfaceMethodsList),
             ]),
@@ -234,6 +241,7 @@ class Crud
                 'namespace' => $this->classes['data_model']['info']['namespace'],
                 'class' => $this->classes['data_model']['info']['class_name'],
                 'data_interface' => $this->classes['data_interface']['class'],
+                'extension_interface' => $extensionInterface,
                 'methods_list' => implode("\n\n", $modelMethodsList),
             ]),
         ];
