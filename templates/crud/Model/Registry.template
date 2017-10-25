@@ -43,6 +43,17 @@ class %class%
     }
 
     /**
+     * Clear all registry entries
+     */
+    public function clear()
+    {
+        $this->registry = [];
+        foreach (array_keys($this->registryByKey) as $key) {
+            $this->registryByKey[$key] = [];
+        }
+    }
+
+    /**
      * Push one object into registry
      * @param int $id
      * @return %data_interface%|null
