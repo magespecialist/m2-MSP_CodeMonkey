@@ -72,9 +72,10 @@ class %class% implements %interface%
         /** @var %model% $%entity_var%Model */
         $%entity_var%Model = $this->%entity_var%Factory->create(['data' => $%entity_var%Data]);
         $%entity_var%Model->setDataChanges(true);
+        if ($%entity_var%->getId()) {
+            $%entity_var%Model->setId($%entity_var%->getId());
+        }
         $this->resource->save($%entity_var%Model);
-        $%entity_var%->setId($%entity_var%Model->getId());
-
         $this->registry->push($%entity_var%Model);
 
         return $this->getById($%entity_var%Model->getId());
