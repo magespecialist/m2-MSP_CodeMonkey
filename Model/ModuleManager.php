@@ -96,6 +96,7 @@ class ModuleManager
      * @param $moduleName
      * @param $className
      * @return string
+     * @throws LocalizedException
      */
     public function getClassFile($moduleName, $className)
     {
@@ -129,6 +130,7 @@ class ModuleManager
      * @param $moduleName
      * @param array $classes
      * @return array
+     * @throws LocalizedException
      */
     public function generateClasses($moduleName, array $classes)
     {

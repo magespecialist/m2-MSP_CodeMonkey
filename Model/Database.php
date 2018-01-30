@@ -43,7 +43,6 @@ class Database extends AbstractDb
      * Get primary key field name
      * @param string $tableName
      * @return string
-     * @throws LocalizedException
      */
     public function getPrimaryKey($tableName)
     {

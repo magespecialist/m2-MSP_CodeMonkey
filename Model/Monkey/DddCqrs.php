@@ -1,5 +1,4 @@
-<?xml version="1.0"?>
-<!--
+<?php
 /**
  * MageSpecialist
  *
@@ -18,16 +17,21 @@
  * @copyright  Copyright (c) 2017 Skeeller srl (http://www.magespecialist.it)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
--->
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
 
-    <type name="Magento\Framework\Console\CommandList">
-        <arguments>
-            <argument name="commands" xsi:type="array">
-                <item name="msp_codemonkey_crud" xsi:type="object">MSP\CodeMonkey\Command\Crud</item>
-                <item name="msp_codemonkey_ddcqrs" xsi:type="object">MSP\CodeMonkey\Command\DddCqrs</item>
-            </argument>
-        </arguments>
-    </type>
-</config>
+namespace MSP\CodeMonkey\Model\Monkey;
+
+use MSP\CodeMonkey\Model\Database;
+use MSP\CodeMonkey\Model\DiManager;
+use MSP\CodeMonkey\Model\Filesystem;
+use MSP\CodeMonkey\Model\ModuleManager;
+use MSP\CodeMonkey\Model\PhpCode;
+use MSP\CodeMonkey\Model\Template;
+
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+ * @SuppressWarnings(PHPMD.TooManyFields)
+ */
+class DddCqrs
+{
+
+}

@@ -133,6 +133,7 @@ class Crud
 
     /**
      * Generate model
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function generateModel()
     {
@@ -151,6 +152,7 @@ class Crud
 
     /**
      * Generate resource
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function generateResource()
     {
@@ -167,6 +169,7 @@ class Crud
 
     /**
      * Generate collection
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function generateCollection()
     {
@@ -184,6 +187,7 @@ class Crud
 
     /**
      * Generate data model
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function generateDataModel()
     {
@@ -249,6 +253,7 @@ class Crud
 
     /**
      * Generate entity registry class
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function generateRegistry()
     {
@@ -286,6 +291,7 @@ class Crud
 
     /**
      * Generate search result interface
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function generateSearchResultInterface()
     {
@@ -301,6 +307,7 @@ class Crud
 
     /**
      * Generate repository class
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function generateRepository()
     {
@@ -379,6 +386,7 @@ class Crud
     /**
      * Create CRUD model and return a list of modified files
      * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function generateCode()
     {
