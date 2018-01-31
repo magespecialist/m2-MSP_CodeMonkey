@@ -1,0 +1,58 @@
+<?php
+%header%
+
+declare(strict_types=1);
+
+namespace %namespace%;
+
+use Magento\Framework\Exception\NoSuchEntityException;
+
+/**
+ * @inheritdoc
+ */
+class %class% implements %interface%
+{
+    /**
+     * @var %resource_model%
+     */
+    private $resource;
+
+    /**
+     * @var %data_interface%Factory
+     */
+    private $factory;
+
+    /**
+     * @param %resource_model% $resource
+     * @param %data_interface%Factory $factory
+     */
+    public function __construct(
+        %resource_model% $resource,
+        %data_interface%Factory $factory
+    ) {
+        $this->resource = $resource;
+        $this->factory = $factory;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function execute(int $%entity_var%Id): %data_interface%
+    {
+        /** @var %data_interface% $%entity_var% */
+        $%entity_var% = $this->factory->create();
+        $this->resource->load(
+            $%entity_var%,
+            $%entity_var%Id,
+            %data_interface%::ID
+        );
+
+        if (null === $%entity_var%->getId()) {
+            throw new NoSuchEntityException(__('%entity_name% with id "%value" does not exist.', [
+                'value' => $%entity_var%Id
+            ]));
+        }
+
+        return $%entity_var%;
+    }
+}

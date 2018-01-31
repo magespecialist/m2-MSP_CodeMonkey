@@ -1,0 +1,135 @@
+<?php
+%header%
+
+declare(strict_types=1);
+
+namespace %namespace%;
+
+use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Api\SearchCriteriaInterface;
+
+/**
+ * @inheritdoc
+ */
+class GetList implements GetListInterface
+{
+    /**
+     * @var CollectionProcessorInterface
+     */
+    private $collectionProcessor;
+
+    /**
+     * @var %collection%Factory
+     */
+    private $collectionFactory;
+
+    /**
+     * @var %search_results_interface%Factory
+     */
+    private $searchResultsFactory;
+
+    /**
+     * @var SearchCriteriaBuilder
+     */
+    private $searchCriteriaBuilder;
+
+    /**
+     * @param CollectionProcessorInterface $collectionProcessor
+     * @param %collection%Factory $collectionFactory
+     * @param %search_results_interface%Factory $searchResultsFactory
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @SuppressWarnings(PHPMD.LongVariable)
+     */
+    public function __construct(
+        CollectionProcessorInterface $collectionProcessor,
+        %collection%Factory $collectionFactory,
+        %search_results_interface%Factory $searchResultsFactory,
+        SearchCriteriaBuilder $searchCriteriaBuilder
+    ) {
+        $this->collectionProcessor = $collectionProcessor;
+        $this->collectionFactory = $collectionFactory;
+        $this->searchResultsFactory = $searchResultsFactory;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+    }
+
+    private function addFilterGroupToCollection(
+        \Magento\Framework\Api\Search\FilterGroup $filterGroup,
+        %collection% $collection
+    ) {
+        $fields = [];
+        $conditions = [];
+        foreach ($filterGroup->getFilters() as $filter) {
+            $condition = $filter->getConditionType() ?: 'eq';
+            $fields[] = $filter->getField();
+
+            $conditions[] = [$condition => $filter->getValue()];
+        }
+
+        if ($fields) {
+            $collection->addFieldToFilter($fields, $conditions);
+        }
+    }
+
+    private function applySearchCriteriaToCollection(
+        \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria,
+        %collection% $collection
+    ) {
+        $this->applySearchCriteriaFiltersToCollection($searchCriteria, $collection);
+        $this->applySearchCriteriaSortOrdersToCollection($searchCriteria, $collection);
+        $this->applySearchCriteriaPagingToCollection($searchCriteria, $collection);
+    }
+
+    private function applySearchCriteriaFiltersToCollection(
+        \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria,
+        %collection% $collection
+    ) {
+        foreach ($searchCriteria->getFilterGroups() as $group) {
+            $this->addFilterGroupToCollection($group, $collection);
+        }
+    }
+
+    private function applySearchCriteriaSortOrdersToCollection(
+        \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria,
+        %collection% $collection
+    ) {
+        $sortOrders = $searchCriteria->getSortOrders();
+        if ($sortOrders) {
+            foreach ($sortOrders as $sortOrder) {
+                $isAscending = $sortOrder->getDirection() == \Magento\Framework\Api\SortOrder::SORT_ASC;
+                $collection->addOrder($sortOrder->getField(), $isAscending ? 'ASC' : 'DESC');
+            }
+        }
+    }
+
+    private function applySearchCriteriaPagingToCollection(
+        \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria,
+        %collection% $collection
+    ) {
+        $collection->setCurPage($searchCriteria->getCurrentPage());
+        $collection->setPageSize($searchCriteria->getPageSize());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function execute(
+        SearchCriteriaInterface $searchCriteria = null
+    ): %search_results_interface% {
+        /** @var %collection% $collection */
+        $collection = $this->collectionFactory->create();
+
+        if (null === $searchCriteria) {
+            $searchCriteria = $this->searchCriteriaBuilder->create();
+        } else {
+            $this->applySearchCriteriaToCollection($searchCriteria, $collection);
+        }
+
+        /** @var %search_results_interface% $searchResult */
+        $searchResult = $this->searchResultsFactory->create();
+        $searchResult->setItems($collection->getItems());
+        $searchResult->setTotalCount($collection->getSize());
+        $searchResult->setSearchCriteria($searchCriteria);
+
+        return $searchResult;
+    }
+}

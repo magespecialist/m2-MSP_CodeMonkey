@@ -14,7 +14,7 @@
  *
  * @category   MSP
  * @package    MSP_CodeMonkey
- * @copyright  Copyright (c) 2017 Skeeller srl (http://www.magespecialist.it)
+ * @copyright  Copyright (c) 2018 Skeeller srl (http://www.magespecialist.it)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -54,6 +54,13 @@ class Crud extends Command
         parent::configure();
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int|null|void
+     * @SuppressWarnings(PHPMD.UnusedFormalParameters)
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $moduleName = $input->getArgument('module');
@@ -64,10 +71,10 @@ class Crud extends Command
             'moduleName' => $moduleName,
             'entityName' => $entityName,
             'tableName' => $tableName,
-            'overwrite' => !! $input->getOption('overwrite'),
+            'overwrite' => (bool) $input->getOption('overwrite'),
         ]);
 
-        $files = $crud->generateCode();
+        $files = $crud->execute();
 
         $output->writeln('Modified files:');
         foreach ($files as $file) {

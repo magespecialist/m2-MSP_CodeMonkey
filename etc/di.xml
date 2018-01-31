@@ -15,7 +15,7 @@
  *
  * @category   MSP
  * @package    MSP_CodeMonkey
- * @copyright  Copyright (c) 2017 Skeeller srl (http://www.magespecialist.it)
+ * @copyright  Copyright (c) 2018 Skeeller srl (http://www.magespecialist.it)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 -->
@@ -26,6 +26,7 @@
         <arguments>
             <argument name="commands" xsi:type="array">
                 <item name="msp_codemonkey_crud" xsi:type="object">MSP\CodeMonkey\Command\Crud</item>
+                <item name="msp_codemonkey_ddcqrs" xsi:type="object">MSP\CodeMonkey\Command\DddCqrs</item>
             </argument>
         </arguments>
     </type>

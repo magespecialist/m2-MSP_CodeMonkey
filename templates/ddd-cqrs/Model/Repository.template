@@ -1,0 +1,87 @@
+<?php
+%header%
+
+declare(strict_types=1);
+
+namespace %namespace%;
+
+use Magento\Framework\Api\SearchCriteriaInterface;
+
+/**
+ * @SuppressWarnings(PHPMD.ShortVariable)
+ * @SuppressWarnings(PHPMD.LongVariable)
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
+class %class% implements %interface%
+{
+    /**
+     * @var %command_save_interface%
+     */
+    private $commandSave;
+
+    /**
+     * @var %command_get_interface%
+     */
+    private $commandGet;%index_di_decl%
+
+    /**
+     * @var %command_delete_interface%
+     */
+    private $commandDeleteById;
+
+    /**
+     * @var %command_list_interface%
+     */
+    private $commandGetList;
+
+    /**
+     * @param %command_save_interface% $commandSave
+     * @param %command_get_interface% $commandGet%index_di_doc%
+     * @param %command_delete_interface% $commandDeleteById
+     * @param %command_list_interface% $commandGetList
+     */
+    public function __construct(
+        %command_save_interface% $commandSave,
+        %command_get_interface% $commandGet,%index_di%
+        %command_delete_interface% $commandDeleteById,
+        %command_list_interface% $commandGetList
+    ) {
+        $this->commandSave = $commandSave;
+        $this->commandGet = $commandGet;%index_di_assign%
+        $this->commandDeleteById = $commandDeleteById;
+        $this->commandGetList = $commandGetList;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function save(%data_interface% $%entity_var%): int
+    {
+        return $this->commandSave->execute($%entity_var%);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function get(int $%entity_var%Id): %data_interface%
+    {
+        return $this->commandGet->execute($%entity_var%Id);
+    }
+%index_methods%
+    /**
+     * @inheritdoc
+     */
+    public function deleteById(int $%entity_var%Id)
+    {
+        $this->commandDeleteById->execute($%entity_var%Id);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getList(
+        SearchCriteriaInterface $searchCriteria = null
+    ): %search_results_interface% {
+        return $this->commandGetList->execute($searchCriteria);
+    }
+}

@@ -14,7 +14,7 @@
  *
  * @category   MSP
  * @package    MSP_CodeMonkey
- * @copyright  Copyright (c) 2017 Skeeller srl (http://www.magespecialist.it)
+ * @copyright  Copyright (c) 2018 Skeeller srl (http://www.magespecialist.it)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -96,6 +96,7 @@ class ModuleManager
      * @param $moduleName
      * @param $className
      * @return string
+     * @throws LocalizedException
      */
     public function getClassFile($moduleName, $className)
     {
@@ -129,6 +130,7 @@ class ModuleManager
      * @param $moduleName
      * @param array $classes
      * @return array
+     * @throws LocalizedException
      */
     public function generateClasses($moduleName, array $classes)
     {

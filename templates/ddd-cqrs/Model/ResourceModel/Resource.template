@@ -1,0 +1,24 @@
+<?php
+%header%
+
+declare(strict_types=1);
+
+namespace %namespace%;
+
+use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
+
+/**
+ * @SuppressWarnings(PHPMD.CamelCaseMethodName)
+ */
+class %class% extends AbstractDb
+{
+    const TABLE_NAME = '%table%';
+
+    protected function _construct()
+    {
+        $this->_init(
+            self::TABLE_NAME,
+            %data_interface%::ID
+        );
+    }
+}

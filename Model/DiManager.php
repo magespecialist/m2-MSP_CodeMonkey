@@ -14,7 +14,7 @@
  *
  * @category   MSP
  * @package    MSP_CodeMonkey
- * @copyright  Copyright (c) 2017 Skeeller srl (http://www.magespecialist.it)
+ * @copyright  Copyright (c) 2018 Skeeller srl (http://www.magespecialist.it)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -37,6 +37,7 @@ class DiManager
      * Get di full path file
      * @param $moduleName
      * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getDiFile($moduleName)
     {
@@ -48,6 +49,7 @@ class DiManager
      * @param $moduleName
      * @param $source
      * @param $dest
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function createPreference($moduleName, $source, $dest)
     {
@@ -71,9 +73,9 @@ class DiManager
 
         // @codingStandardsIgnoreStart
         $xpath = new \DOMXpath($dom);
+        $preferences = $xpath->query('//preference');
         // @codingStandardsIgnoreEnd
 
-        $preferences = $xpath->query('//preference');
         for ($i = 0; $i < $preferences->length; $i++) {
             $nodeValue = $preferences->item($i)->attributes->getNamedItem('for')->nodeValue;
             if ($nodeValue == $source) {

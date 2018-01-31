@@ -14,7 +14,7 @@
  *
  * @category   MSP
  * @package    MSP_CodeMonkey
- * @copyright  Copyright (c) 2017 Skeeller srl (http://www.magespecialist.it)
+ * @copyright  Copyright (c) 2018 Skeeller srl (http://www.magespecialist.it)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -100,6 +100,7 @@ class Crud
 
     /**
      * Generate class names
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function prepare()
     {
@@ -133,6 +134,7 @@ class Crud
 
     /**
      * Generate model
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function generateModel()
     {
@@ -151,6 +153,7 @@ class Crud
 
     /**
      * Generate resource
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function generateResource()
     {
@@ -167,6 +170,7 @@ class Crud
 
     /**
      * Generate collection
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function generateCollection()
     {
@@ -184,6 +188,7 @@ class Crud
 
     /**
      * Generate data model
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function generateDataModel()
     {
@@ -249,6 +254,7 @@ class Crud
 
     /**
      * Generate entity registry class
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function generateRegistry()
     {
@@ -286,6 +292,7 @@ class Crud
 
     /**
      * Generate search result interface
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function generateSearchResultInterface()
     {
@@ -301,6 +308,7 @@ class Crud
 
     /**
      * Generate repository class
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function generateRepository()
     {
@@ -356,6 +364,7 @@ class Crud
 
     /**
      * Inject DI preferences
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function injectDi()
     {
@@ -379,8 +388,9 @@ class Crud
     /**
      * Create CRUD model and return a list of modified files
      * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function generateCode()
+    public function execute()
     {
         $this->prepare();
 

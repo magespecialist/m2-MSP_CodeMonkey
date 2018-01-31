@@ -1,0 +1,7 @@
+    /**
+     * @inheritdoc
+     */
+    public function getBy%column_name%(%data_type% $%var_name%): %data_interface%
+    {
+        return $this->%command%->execute($%var_name%);
+    }

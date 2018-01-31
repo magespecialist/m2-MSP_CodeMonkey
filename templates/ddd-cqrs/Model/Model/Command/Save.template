@@ -1,0 +1,50 @@
+<?php
+%header%
+
+declare(strict_types=1);
+
+namespace %namespace%;
+
+use Magento\Framework\Exception\CouldNotSaveException;
+use Psr\Log\LoggerInterface;
+
+/**
+ * @inheritdoc
+ */
+class %class% implements %interface%
+{
+    /**
+     * @var %resource_model%
+     */
+    private $resource;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @param %resource_model% $resource
+     */
+    public function __construct(
+        %resource_model% $resource,
+        LoggerInterface $logger
+    ) {
+        $this->resource = $resource;
+        $this->logger = $logger;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function execute(%data_interface% $%entity_var%): int
+    {
+        try {
+            $this->resource->save($%entity_var%);
+            return (int) $%entity_var%->getId();
+        } catch (\Exception $e) {
+            $this->logger->error($e->getMessage());
+            throw new CouldNotSaveException(__('Could not save %entity_name%'), $e);
+        }
+    }
+}

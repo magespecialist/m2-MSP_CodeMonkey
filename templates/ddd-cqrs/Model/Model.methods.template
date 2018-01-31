@@ -1,0 +1,7 @@
+    /**
+     * @inheritdoc
+     */
+    public function get%fn_name%(): %data_type%
+    {
+        return $this->getData(self::%field_const%);
+    }

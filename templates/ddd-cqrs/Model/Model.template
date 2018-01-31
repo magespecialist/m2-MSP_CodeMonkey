@@ -1,0 +1,38 @@
+<?php
+%header%
+
+declare(strict_types=1);
+
+namespace %namespace%;
+
+use Magento\Framework\Model\AbstractExtensibleModel;
+
+class %class% extends AbstractExtensibleModel implements
+    %data_interface%
+{
+%methods_list%
+
+    /**
+     * @inheritdoc
+     */
+    public function getExtensionAttributes(): %extension_interface%
+    {
+        $extensionAttributes = $this->_getExtensionAttributes();
+        if (null === $extensionAttributes) {
+            $extensionAttributes = $this->extensionAttributesFactory->create(
+                %extension_interface%::class
+            );
+            $this->setExtensionAttributes($extensionAttributes);
+        }
+        return $extensionAttributes;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setExtensionAttributes(
+        %extension_interface% $extensionAttributes
+    ) {
+        $this->_setExtensionAttributes($extensionAttributes);
+    }
+}

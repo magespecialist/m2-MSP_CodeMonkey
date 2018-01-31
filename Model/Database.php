@@ -14,7 +14,7 @@
  *
  * @category   MSP
  * @package    MSP_CodeMonkey
- * @copyright  Copyright (c) 2017 Skeeller srl (http://www.magespecialist.it)
+ * @copyright  Copyright (c) 2018 Skeeller srl (http://www.magespecialist.it)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -43,7 +43,6 @@ class Database extends AbstractDb
      * Get primary key field name
      * @param string $tableName
      * @return string
-     * @throws LocalizedException
      */
     public function getPrimaryKey($tableName)
     {
