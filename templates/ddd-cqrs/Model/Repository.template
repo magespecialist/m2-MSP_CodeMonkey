@@ -5,6 +5,8 @@ declare(strict_types=1);
 
 namespace %namespace%;
 
+use Magento\Framework\Api\SearchCriteriaInterface;
+
 /**
  * @SuppressWarnings(PHPMD.ShortVariable)
  * @SuppressWarnings(PHPMD.LongVariable)
@@ -13,39 +15,39 @@ namespace %namespace%;
 class %class% implements %interface%
 {
     /**
-     * @var SaveInterface
+     * @var %command_save_interface%
      */
     private $commandSave;
 
     /**
-     * @var GetInterface
+     * @var %command_get_interface%
      */
-    private $commandGet;
+    private $commandGet;%index_di_decl%
 
     /**
-     * @var DeleteByIdInterface
+     * @var %command_delete_interface%
      */
     private $commandDeleteById;
 
     /**
-     * @var GetListInterface
+     * @var %command_list_interface%
      */
     private $commandGetList;
 
     /**
-     * @param SaveInterface $commandSave
-     * @param GetInterface $commandGet
-     * @param DeleteByIdInterface $commandDeleteById
-     * @param GetListInterface $commandGetList
+     * @param %command_save_interface% $commandSave
+     * @param %command_get_interface% $commandGet%index_di_doc%
+     * @param %command_delete_interface% $commandDeleteById
+     * @param %command_list_interface% $commandGetList
      */
     public function __construct(
-        SaveInterface $commandSave,
-        GetInterface $commandGet,
-        DeleteByIdInterface $commandDeleteById,
-        GetListInterface $commandGetList
+        %command_save_interface% $commandSave,
+        %command_get_interface% $commandGet,%index_di%
+        %command_delete_interface% $commandDeleteById,
+        %command_list_interface% $commandGetList
     ) {
         $this->commandSave = $commandSave;
-        $this->commandGet = $commandGet;
+        $this->commandGet = $commandGet;%index_di_assign%
         $this->commandDeleteById = $commandDeleteById;
         $this->commandGetList = $commandGetList;
     }
@@ -65,7 +67,7 @@ class %class% implements %interface%
     {
         return $this->commandGet->execute($%entity_var%Id);
     }
-
+%index_methods%
     /**
      * @inheritdoc
      */
@@ -77,8 +79,9 @@ class %class% implements %interface%
     /**
      * @inheritdoc
      */
-    public function getList(SearchCriteriaInterface $searchCriteria = null): StockSearchResultsInterface
-    {
+    public function getList(
+        SearchCriteriaInterface $searchCriteria = null
+    ): %search_results_interface% {
         return $this->commandGetList->execute($searchCriteria);
     }
 }

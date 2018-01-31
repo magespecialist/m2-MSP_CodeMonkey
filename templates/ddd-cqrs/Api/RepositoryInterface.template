@@ -11,28 +11,28 @@ namespace %namespace%;
 interface %class%
 {
     /**
-     * Save object
+     * Save %entity_name%
      * @param %data_interface% $%entity_var%
      * @return void
      */
     public function save(%data_interface% $%entity_var%);
 
     /**
-     * Get object by id
+     * Get %entity_name% by id
      * @param int $%entity_var%Iid
      * @return %data_interface%
      */
-    public function getById(int $%entity_var%Iid): %data_interface%;
+    public function get(int $%entity_var%Iid): %data_interface%;
 %index_methods%
     /**
-     * Delete object
+     * Delete %entity_name%
      * @param int $%entity_var%Iid
      * @return void
      */
     public function deleteById(int $%entity_var%Iid);
 
     /**
-     * Get a list of object
+     * Get a list of %entity_name%
      * @param \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria
      * @return %search_results_interface%
      */

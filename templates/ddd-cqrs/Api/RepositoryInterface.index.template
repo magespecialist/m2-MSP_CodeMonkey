@@ -1,6 +1,6 @@
     /**
      * Get by %column_name% value
-     * @param %data_type% $value
+     * @param %data_type% $%var_name%
      * @return %data_interface%
      */
-    public function getBy%column_name%($value): %data_interface%;
+    public function getBy%column_name%(%data_type% $%var_name%): %data_interface%;

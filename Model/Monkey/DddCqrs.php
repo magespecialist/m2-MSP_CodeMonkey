@@ -313,15 +313,20 @@ class DddCqrs
     {
         $idxMthRepoList = [];
         $idxMthIfaceList = [];
+        $diPropsDeclarations = [];
+        $diDocs = [];
+        $diParams = [];
+        $diAssigns = [];
 
         foreach ($this->indexedColumns as $columnName) {
             $columnInfo = $this->columns[$columnName];
 
             $idxMthRepoList[] = $this->template->getCodeFromTemplate('ddd-cqrs/Model/Repository.index', [
+                'var_name' => lcfirst($this->phpCode->toCamelCase($columnName)),
+                'data_type' => $this->database->getTypeByColumnType($columnInfo['DATA_TYPE']),
+                'data_interface' => $this->classes['data_interface']['class'],
                 'column_name' => ucfirst($this->phpCode->toCamelCase($columnName)),
-                'column_field' => $columnName,
-                'entity_var' => $this->entityVar,
-                'entity_name' => $this->entityName,
+                'command' => 'commandGetBy' . $this->phpCode->toCamelCase($columnName),
             ]);
 
             $idxMthIfaceList[] = $this->template->getCodeFromTemplate('ddd-cqrs/Api/RepositoryInterface.index', [
@@ -329,7 +334,31 @@ class DddCqrs
                 'data_interface' => $this->classes['data_interface']['class'],
                 'entity_var' => $this->entityVar,
                 'column_name' => ucfirst($this->phpCode->toCamelCase($columnName)),
+                'var_name' => lcfirst($this->phpCode->toCamelCase($columnName)),
             ]);
+
+            $diPropsDeclarations[] =
+                $this->template->getCodeFromTemplate('ddd-cqrs/Model/Repository.index.decl', [
+                    'type' => $this->classes['command_getby_' . $columnName . '_interface']['class'],
+                    'var' => 'commandGetBy' . $this->phpCode->toCamelCase($columnName),
+                ]);
+
+            $diDocs[] =
+                $this->template->getCodeFromTemplate('ddd-cqrs/Model/Repository.index.doc', [
+                    'type' => $this->classes['command_getby_' . $columnName . '_interface']['class'],
+                    'var' => 'commandGetBy' . $this->phpCode->toCamelCase($columnName),
+                ]);
+
+            $diParams[] =
+                $this->template->getCodeFromTemplate('ddd-cqrs/Model/Repository.index.di', [
+                    'type' => $this->classes['command_getby_' . $columnName . '_interface']['class'],
+                    'var' => 'commandGetBy' . $this->phpCode->toCamelCase($columnName),
+                ]);
+
+            $diAssigns[] =
+                $this->template->getCodeFromTemplate('ddd-cqrs/Model/Repository.index.assign', [
+                    'var' => 'commandGetBy' . $this->phpCode->toCamelCase($columnName),
+                ]);
         }
 
         $this->outFiles['repository_interface'] = [
@@ -358,6 +387,16 @@ class DddCqrs
                 'entity_name' => $this->entityName,
                 'resource' => $this->classes['resource']['class'],
                 'index_methods' => !empty($idxMthRepoList) ? "\n" . implode("\n\n", $idxMthRepoList) . "\n" : '',
+
+                'command_get_interface' => $this->classes['command_get_interface']['class'],
+                'command_delete_interface' => $this->classes['command_delete_interface']['class'],
+                'command_save_interface' => $this->classes['command_save_interface']['class'],
+                'command_list_interface' => $this->classes['command_list_interface']['class'],
+
+                'index_di_decl' => implode("", $diPropsDeclarations),
+                'index_di_doc' => implode("", $diDocs),
+                'index_di' => implode("", $diParams),
+                'index_di_assign' => implode("", $diAssigns),
             ]),
         ];
     }

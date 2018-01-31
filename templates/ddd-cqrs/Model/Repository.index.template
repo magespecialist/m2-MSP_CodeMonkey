@@ -1,19 +1,7 @@
     /**
      * @inheritdoc
      */
-    public function getBy%column_name%($value)
+    public function getBy%column_name%(%data_type% $%var_name%): %data_interface%
     {
-        $fromRegistry = $this->registry->retrieveBy%column_name%($value);
-        if ($fromRegistry === null) {
-            $%entity_var% = $this->%entity_var%Factory->create();
-            $this->resource->load($%entity_var%, $value, '%column_field%');
-
-            if (!$%entity_var%->getId()) {
-                throw new \Magento\Framework\Exception\NoSuchEntityException(__('No such %entity_name%'));
-            }
-
-            $this->registry->push($%entity_var%);
-        }
-
-        return $this->registry->retrieveBy%column_name%($value);
+        return $this->%command%->execute($%var_name%);
     }
