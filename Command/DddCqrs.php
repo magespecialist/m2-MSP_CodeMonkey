@@ -48,6 +48,7 @@ class DddCqrs extends Command
 
         $this->addOption('overwrite', null, InputOption::VALUE_NONE, 'Overwrite existing files');
         $this->addArgument('module', InputArgument::REQUIRED, 'Module name');
+        $this->addArgument('module_api', InputArgument::REQUIRED, 'API Module name');
         $this->addArgument('entity_name', InputArgument::REQUIRED, 'Entity name');
         $this->addArgument('table', InputArgument::REQUIRED, 'Database table name');
 
@@ -64,11 +65,13 @@ class DddCqrs extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $moduleName = $input->getArgument('module');
+        $apiModuleName = $input->getArgument('module_api');
         $entityName = $input->getArgument('entity_name');
         $tableName = $input->getArgument('table');
 
         $dddCqrs = $this->dddCqrsFactory->create([
             'moduleName' => $moduleName,
+            'apiModuleName' => $apiModuleName,
             'entityName' => $entityName,
             'tableName' => $tableName,
             'overwrite' => (bool) $input->getOption('overwrite'),

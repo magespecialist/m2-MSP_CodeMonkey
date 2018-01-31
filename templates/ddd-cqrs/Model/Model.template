@@ -1,9 +1,11 @@
 <?php
 %header%
 
+declare(strict_types=1);
+
 namespace %namespace%;
 
-use Magento\Framework\Api\AbstractExtensibleObject;
+use Magento\Framework\Model\AbstractExtensibleModel;
 
 class %class% extends AbstractExtensibleModel implements
     %data_interface%
@@ -17,7 +19,9 @@ class %class% extends AbstractExtensibleModel implements
     {
         $extensionAttributes = $this->_getExtensionAttributes();
         if (null === $extensionAttributes) {
-            $extensionAttributes = $this->extensionAttributesFactory->create(%extension_interface%::class);
+            $extensionAttributes = $this->extensionAttributesFactory->create(
+                %extension_interface%::class
+            );
             $this->setExtensionAttributes($extensionAttributes);
         }
         return $extensionAttributes;
@@ -26,8 +30,9 @@ class %class% extends AbstractExtensibleModel implements
     /**
      * @inheritdoc
      */
-    public function setExtensionAttributes(%extension_interface% $extensionAttributes)
-    {
+    public function setExtensionAttributes(
+        %extension_interface% $extensionAttributes
+    ) {
         $this->_setExtensionAttributes($extensionAttributes);
     }
 }

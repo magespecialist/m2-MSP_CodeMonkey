@@ -1,0 +1,32 @@
+<?php
+%header%
+
+declare(strict_types=1);
+
+namespace %namespace%;
+
+use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Validation\ValidationException;
+
+/**
+ * Save %entity_name% data command (Service Provider Interface - SPI)
+ *
+ * Separate command interface to which Repository proxies initial Save call, could be considered as SPI - Interfaces
+ * that you should extend and implement to customize current behaviour, but NOT expected to be used (called) in the code
+ * of business logic directly
+ *
+ * @see %repository_interface%
+ * @api
+ */
+interface %class%
+{
+    /**
+     * Save %entity_name% data
+     *
+     * @param %data_interface% $source
+     * @return int
+     * @throws ValidationException
+     * @throws CouldNotSaveException
+     */
+    public function execute(%data_interface% $source): int;
+}

@@ -10,7 +10,7 @@ use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
  */
 class %class% extends AbstractCollection
 {
-    protected $_idFieldName = '%primary_key%';
+    protected $_idFieldName = %primary_key%;
 
     protected function _construct()
     {

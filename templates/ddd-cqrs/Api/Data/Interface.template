@@ -1,6 +1,8 @@
 <?php
 %header%
 
+declare(strict_types=1);
+
 namespace %namespace%;
 
 use Magento\Framework\Api\ExtensibleDataInterface;

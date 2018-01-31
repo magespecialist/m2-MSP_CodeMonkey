@@ -1,6 +1,8 @@
 <?php
 %header%
 
+declare(strict_types=1);
+
 namespace %namespace%;
 
 use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
@@ -10,7 +12,7 @@ use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
  */
 class %class% extends AbstractCollection
 {
-    protected $_idFieldName = '%primary_key%';
+    protected $_idFieldName = %data_interface%::ID;
 
     protected function _construct()
     {

@@ -1,0 +1,84 @@
+<?php
+%header%
+
+declare(strict_types=1);
+
+namespace %namespace%;
+
+/**
+ * @SuppressWarnings(PHPMD.ShortVariable)
+ * @SuppressWarnings(PHPMD.LongVariable)
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
+class %class% implements %interface%
+{
+    /**
+     * @var SaveInterface
+     */
+    private $commandSave;
+
+    /**
+     * @var GetInterface
+     */
+    private $commandGet;
+
+    /**
+     * @var DeleteByIdInterface
+     */
+    private $commandDeleteById;
+
+    /**
+     * @var GetListInterface
+     */
+    private $commandGetList;
+
+    /**
+     * @param SaveInterface $commandSave
+     * @param GetInterface $commandGet
+     * @param DeleteByIdInterface $commandDeleteById
+     * @param GetListInterface $commandGetList
+     */
+    public function __construct(
+        SaveInterface $commandSave,
+        GetInterface $commandGet,
+        DeleteByIdInterface $commandDeleteById,
+        GetListInterface $commandGetList
+    ) {
+        $this->commandSave = $commandSave;
+        $this->commandGet = $commandGet;
+        $this->commandDeleteById = $commandDeleteById;
+        $this->commandGetList = $commandGetList;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function save(%data_interface% $%entity_var%): int
+    {
+        return $this->commandSave->execute($%entity_var%);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function get(int $%entity_var%Id): %data_interface%
+    {
+        return $this->commandGet->execute($%entity_var%Id);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function deleteById(int $%entity_var%Id)
+    {
+        $this->commandDeleteById->execute($%entity_var%Id);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getList(SearchCriteriaInterface $searchCriteria = null): StockSearchResultsInterface
+    {
+        return $this->commandGetList->execute($searchCriteria);
+    }
+}

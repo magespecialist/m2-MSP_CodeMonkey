@@ -1,0 +1,30 @@
+<?php
+%header%
+
+declare(strict_types=1);
+
+namespace %namespace%;
+
+use Magento\Framework\Exception\NoSuchEntityException;
+
+/**
+ * Get %entity_name% by %entity_var%Id command (Service Provider Interface - SPI)
+ *
+ * Separate command interface to which Repository proxies initial Get call, could be considered as SPI - Interfaces
+ * that you should extend and implement to customize current behaviour, but NOT expected to be used (called) in the code
+ * of business logic directly
+ *
+ * @see %repository_interface%
+ * @api
+ */
+interface %class%
+{
+    /**
+     * Get %entity_name% data by given %entity_var%Id
+     *
+     * @param int $%entity_var%Id
+     * @return %data_interface%
+     * @throws NoSuchEntityException
+     */
+    public function execute(int $%entity_var%Id): %data_interface%;
+}

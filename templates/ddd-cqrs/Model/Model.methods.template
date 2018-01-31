@@ -3,5 +3,5 @@
      */
     public function get%fn_name%(): %data_type%
     {
-        return $this->_get(self::%field_const%);
+        return $this->getData(self::%field_const%);
     }
