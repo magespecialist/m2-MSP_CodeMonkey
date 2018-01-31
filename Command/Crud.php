@@ -54,6 +54,13 @@ class Crud extends Command
         parent::configure();
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int|null|void
+     * @SuppressWarnings(PHPMD.UnusedFormalParameters)
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $moduleName = $input->getArgument('module');
@@ -64,7 +71,7 @@ class Crud extends Command
             'moduleName' => $moduleName,
             'entityName' => $entityName,
             'tableName' => $tableName,
-            'overwrite' => !! $input->getOption('overwrite'),
+            'overwrite' => (bool) $input->getOption('overwrite'),
         ]);
 
         $files = $crud->execute();

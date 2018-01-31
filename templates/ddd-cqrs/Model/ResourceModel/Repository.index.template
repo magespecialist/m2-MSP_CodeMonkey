@@ -1,5 +1,5 @@
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getBy%column_name%($value)
     {

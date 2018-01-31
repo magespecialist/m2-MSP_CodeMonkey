@@ -59,7 +59,7 @@ class %class% implements %interface%
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function save(%data_interface% $%entity_var%)
     {
@@ -82,7 +82,7 @@ class %class% implements %interface%
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getById($id)
     {
@@ -102,7 +102,7 @@ class %class% implements %interface%
     }
 %index_methods%
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function delete(%data_interface% $%entity_var%)
     {
@@ -124,7 +124,7 @@ class %class% implements %interface%
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getList(\Magento\Framework\Api\SearchCriteriaInterface $searchCriteria)
     {

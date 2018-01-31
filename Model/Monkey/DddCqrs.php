@@ -126,7 +126,7 @@ class DddCqrs
             'data_interface' => 'Api\\Data\\' . $this->entityName . 'Interface',
             'repository' => 'Model\\ResourceModel\\' . $this->entityName . 'Repository',
             'repository_interface' => 'Api\\' . $this->entityName . 'RepositoryInterface',
-            'search_results_interface' => 'Api\\Data\\' . $this->entityName . 'SearchResultsInterface',
+            'search_results_interface' => 'Api\\' . $this->entityName . 'SearchResultsInterface',
         ]);
     }
 
@@ -219,16 +219,111 @@ class DddCqrs
             ]),
         ];
 
-        $this->outFiles['data_model'] = [
-            'file' => $this->classes['data_model']['file'],
+        $this->outFiles['model'] = [
+            'file' => $this->classes['model']['file'],
             'code' => $this->template->getCodeFromTemplate('ddd-cqrs/Model/Data/Model', [
-                'namespace' => $this->classes['data_model']['info']['namespace'],
-                'class' => $this->classes['data_model']['info']['class_name'],
+                'namespace' => $this->classes['model']['info']['namespace'],
+                'class' => $this->classes['model']['info']['class_name'],
                 'data_interface' => $this->classes['data_interface']['class'],
                 'extension_interface' => $extensionInterface,
                 'methods_list' => implode("\n\n", $modelMethodsList),
             ]),
         ];
+    }
+
+    /**
+     * Generate search result interface
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    private function generateSearchResultInterface()
+    {
+        $this->outFiles['search_results_interface'] = [
+            'file' => $this->classes['search_results_interface']['file'],
+            'code' => $this->template->getCodeFromTemplate('ddd-cqrs/Api/SearchResultInterface', [
+                'namespace' => $this->classes['search_results_interface']['info']['namespace'],
+                'class' => $this->classes['search_results_interface']['info']['class_name'],
+                'data_interface' => $this->classes['data_interface']['class'],
+            ]),
+        ];
+    }
+
+    /**
+     * Generate repository class
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    private function generateRepository()
+    {
+        $idxMthRepoList = [];
+        $idxMthIfaceList = [];
+
+        foreach ($this->indexedColumns as $columnName) {
+            $columnInfo = $this->columns[$columnName];
+
+            $idxMthRepoList[] = $this->template->getCodeFromTemplate('ddd-cqrs/Model/ResourceModel/Repository.index', [
+                'column_name' => ucfirst($this->phpCode->toCamelCase($columnName)),
+                'column_field' => $columnName,
+                'entity_var' => $this->entityVar,
+                'entity_name' => $this->entityName,
+            ]);
+
+            $idxMthIfaceList[] = $this->template->getCodeFromTemplate('ddd-cqrs/Api/RepositoryInterface.index', [
+                'data_type' => $this->database->getTypeByColumnType($columnInfo['DATA_TYPE']),
+                'data_interface' => $this->classes['data_interface']['class'],
+                'column_name' => ucfirst($this->phpCode->toCamelCase($columnName)),
+            ]);
+        }
+
+        $this->outFiles['repository_interface'] = [
+            'file' => $this->classes['repository_interface']['file'],
+            'code' => $this->template->getCodeFromTemplate('ddd-cqrs/Api/RepositoryInterface', [
+                'namespace' => $this->classes['repository_interface']['info']['namespace'],
+                'class' => $this->classes['repository_interface']['info']['class_name'],
+                'data_interface' => $this->classes['data_interface']['class'],
+                'search_results_interface' => $this->classes['search_results_interface']['class'],
+                'index_methods' => !empty($idxMthRepoList) ? "\n" . implode("\n\n", $idxMthIfaceList) . "\n" : '',
+            ]),
+        ];
+
+        $this->outFiles['repository'] = [
+            'file' => $this->classes['repository']['file'],
+            'code' => $this->template->getCodeFromTemplate('ddd-cqrs/Model/ResourceModel/Repository', [
+                'namespace' => $this->classes['repository']['info']['namespace'],
+                'interface' => $this->classes['repository_interface']['class'],
+                'model' => $this->classes['model']['class'],
+                'class' => $this->classes['repository']['info']['class_name'],
+                'data_interface' => $this->classes['data_interface']['class'],
+                'collection' => $this->classes['collection']['class'],
+                'search_results_interface' => $this->classes['search_results_interface']['class'],
+                'entity_var' => $this->entityVar,
+                'entity_name' => $this->entityName,
+                'registry' => $this->classes['registry']['class'],
+                'resource' => $this->classes['resource']['class'],
+                'index_methods' => !empty($idxMthRepoList) ? "\n" . implode("\n\n", $idxMthRepoList) . "\n" : '',
+            ]),
+        ];
+    }
+
+    /**
+     * Inject DI preferences
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    private function injectDi()
+    {
+        $this->diManager->createPreference(
+            $this->moduleName,
+            $this->classes['data_interface']['class'],
+            $this->classes['model']['class']
+        );
+        $this->diManager->createPreference(
+            $this->moduleName,
+            $this->classes['repository_interface']['class'],
+            $this->classes['repository']['class']
+        );
+        $this->diManager->createPreference(
+            $this->moduleName,
+            $this->classes['search_results_interface']['class'],
+            '\\Magento\\Framework\\Api\\SearchResults'
+        );
     }
 
     /**
@@ -241,10 +336,10 @@ class DddCqrs
         $this->prepare();
 
         $this->generateModel();
-        $this->generateResource();
-        $this->generateCollection();
-        $this->generateSearchResultInterface();
-        $this->generateRepository();
+//        $this->generateResource();
+//        $this->generateCollection();
+//        $this->generateSearchResultInterface();
+//        $this->generateRepository();
 
         $outFilesNames = [];
         foreach ($this->outFiles as $outFile) {
@@ -259,7 +354,7 @@ class DddCqrs
             $this->filesystem->writeFile($outFile['file'], $outFile['code']);
         }
 
-        $this->injectDi();
+//        $this->injectDi();
 
         return $outFilesNames;
     }
