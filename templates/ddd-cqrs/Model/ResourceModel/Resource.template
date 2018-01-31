@@ -16,6 +16,9 @@ class %class% extends AbstractDb
 
     protected function _construct()
     {
-        $this->_init(self::TABLE_NAME, %data_interface%::ID);
+        $this->_init(
+            self::TABLE_NAME,
+            %data_interface%::ID
+        );
     }
 }
