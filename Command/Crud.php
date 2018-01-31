@@ -67,7 +67,7 @@ class Crud extends Command
             'overwrite' => !! $input->getOption('overwrite'),
         ]);
 
-        $files = $crud->generateCode();
+        $files = $crud->execute();
 
         $output->writeln('Modified files:');
         foreach ($files as $file) {

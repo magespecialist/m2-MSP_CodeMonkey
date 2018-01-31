@@ -1,0 +1,38 @@
+<?php
+%header%
+
+namespace %namespace%;
+
+/**
+ * @SuppressWarnings(PHPMD.ShortVariable)
+ */
+interface %class%
+{
+    /**
+     * Save object
+     * @param %data_interface% $object
+     * @return %data_interface%
+     */
+    public function save(%data_interface% $object);
+
+    /**
+     * Get object by id
+     * @param int $id
+     * @return %data_interface%
+     */
+    public function getById($id): %data_interface%;
+%index_methods%
+    /**
+     * Delete object
+     * @param int $id
+     * @return void
+     */
+    public function deleteById(int $id);
+
+    /**
+     * Get a list of object
+     * @param \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria
+     * @return %search_results_interface%
+     */
+    public function getList(\Magento\Framework\Api\SearchCriteriaInterface $searchCriteria): %search_results_interface%;
+}

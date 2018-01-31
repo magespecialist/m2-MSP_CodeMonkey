@@ -100,6 +100,7 @@ class Crud
 
     /**
      * Generate class names
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function prepare()
     {
@@ -363,6 +364,7 @@ class Crud
 
     /**
      * Inject DI preferences
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function injectDi()
     {
@@ -388,7 +390,7 @@ class Crud
      * @return array
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function generateCode()
+    public function execute()
     {
         $this->prepare();
 

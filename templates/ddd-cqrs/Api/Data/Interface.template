@@ -1,0 +1,28 @@
+<?php
+%header%
+
+namespace %namespace%;
+
+use Magento\Framework\Api\ExtensibleDataInterface;
+
+interface %class% extends ExtensibleDataInterface
+{
+%const_list%
+
+%methods_list%
+
+    /**
+     * Retrieve existing extension attributes object or create a new one
+     * @return %extension_interface%|null
+     */
+    public function getExtensionAttributes(): %extension_interface%;
+
+    /**
+     * Set an extension attributes object
+     * @param %extension_interface% $extensionAttributes
+     * @return $this
+     */
+    public function setExtensionAttributes(
+        %extension_interface% $extensionAttributes
+    );
+}

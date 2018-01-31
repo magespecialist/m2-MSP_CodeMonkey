@@ -1,0 +1,5 @@
+    /**
+     * Get value for %field_name%
+     * @return %data_type%
+     */
+    public function get%fn_name%(): %data_type%;

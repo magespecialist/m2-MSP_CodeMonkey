@@ -1,0 +1,13 @@
+    /**
+     * Retrieve by %column_name% value
+     * @param %data_type% $value
+     * @return %data_interface%|null
+     */
+    public function retrieveBy%column_name%($value)
+    {
+        if (isset($this->registryByKey['%column_field%'][$value])) {
+            return $this->retrieveById($this->registryByKey['%column_field%'][$value]);
+        }
+
+        return null;
+    }

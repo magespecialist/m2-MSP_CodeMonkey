@@ -1,0 +1,17 @@
+<?php
+%header%
+
+namespace %namespace%;
+
+use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
+
+/**
+ * @SuppressWarnings(PHPMD.CamelCaseMethodName)
+ */
+class %class% extends AbstractDb
+{
+    protected function _construct()
+    {
+        $this->_init('%table%', '%primary_key%');
+    }
+}

@@ -1,0 +1,22 @@
+<?php
+%header%
+
+namespace %namespace%;
+
+use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
+
+/**
+ * @SuppressWarnings(PHPMD.CamelCaseMethodName)
+ */
+class %class% extends AbstractCollection
+{
+    protected $_idFieldName = '%primary_key%';
+
+    protected function _construct()
+    {
+        $this->_init(
+            %model%::class,
+            %resource%::class
+        );
+    }
+}
