@@ -70,16 +70,6 @@ class GetList implements GetListInterface
         }
     }
 
-    private function convertCollectionToDataItemsArray(
-        %collection% $collection
-    ) {
-        $vendors = array_map(function (%model% $item) {
-            return $item->getDataModel();
-        }, $collection->getItems());
-
-        return $vendors;
-    }
-
     private function applySearchCriteriaToCollection(
         \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria,
         %collection% $collection
