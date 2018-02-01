@@ -6,7 +6,6 @@ declare(strict_types=1);
 namespace %namespace%;
 
 use Magento\Framework\Exception\CouldNotSaveException;
-use Magento\Framework\Validation\ValidationException;
 
 /**
  * Save %entity_name% data command (Service Provider Interface - SPI)
@@ -25,7 +24,6 @@ interface %class%
      *
      * @param %data_interface% $source
      * @return int
-     * @throws ValidationException
      * @throws CouldNotSaveException
      */
     public function execute(%data_interface% $source): int;

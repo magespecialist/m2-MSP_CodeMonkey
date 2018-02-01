@@ -1,0 +1,132 @@
+<?php
+%header%
+
+declare(strict_types=1);
+
+namespace %namespace%;
+
+use Magento\TestFramework\Helper\Bootstrap;
+use Magento\TestFramework\TestCase\AbstractController;
+use Magento\Framework\Exception\NoSuchEntityException;
+
+class %class% extends AbstractController
+{
+    /**
+     * @var %repository_interface%
+     */
+    private $repository;
+
+    /**
+     * @var %data_interface%Factory
+     */
+    private $factory;
+
+    protected function setUp()
+    {
+        $this->repository = Bootstrap::getObjectManager()->create(
+            %repository_interface%::class
+        );
+        $this->factory = Bootstrap::getObjectManager()->create(
+            %data_interface%Factory::class
+        );
+    }
+
+    /**
+     * Generate random values for this entity
+     * @return array
+     */
+    private function generateRandomValues()
+    {
+        return [
+%values_generator%
+        ];
+    }
+
+    /**
+     * Generate random entities
+     * @param int $itemsCount
+     * @return array
+     */
+    private function generateEntities(int $itemsCount): array
+    {
+        $res = [];
+        for ($i=0; $i<$itemsCount; $i++) {
+            $%entity_var% = $this->factory->create()->setData($this->generateRandomValues());
+            $this->repository->save($%entity_var%);
+            $res[] = $%entity_var%;
+        }
+
+        return $res;
+    }
+
+    /**
+     * Creates a bunch of items, then retrieve them from DB and compare to original information
+     */
+    public function testCreateAndRead()
+    {
+        // Create entities
+        $entities = $this->generateEntities(15);
+
+        // Check entity creation entities
+        foreach ($entities as $entity) {
+            $this->assertGreaterThan(0, $entity->getId(), 'Item was not created');
+        }
+
+        // Retrieve entities and confirm
+        foreach ($entities as $entity) {
+            $entityGet = $this->repository->get((int) $entity->getId());
+
+            foreach ($entityGet->getData() as $k => $v) {
+                // Perform non strict comparison due to SQL layer converting values to strings
+                $this->assertEquals(
+                    true,
+                    $entity->getData($k) == $v,
+                    'Field ' . $k . ' not correctly saved or retrieved'
+                );
+            }
+        }
+    }
+
+    /**
+     * Creates a bunch of items, then retrieve them from DB, delete and check results
+     */
+    public function testCreateAndDelete()
+    {
+        // Create entities
+        $entities = $this->generateEntities(3);
+
+        // Delete entities
+        foreach ($entities as $entity) {
+            $this->repository->deleteById((int) $entity->getId());
+
+            $this->setExpectedException(NoSuchEntityException::class);
+            $this->repository->get((int) $entity->getId());
+        }
+    }
+
+    /**
+     * Creates a bunch of items, then retrieve them from DB using a list and compare results
+     */
+    public function testCreateAndList()
+    {
+        // Create entities
+        $entities = $this->generateEntities(15);
+
+        // Retrieve list
+        $entitiesList = $this->repository->getList()->getItems();
+        foreach ($entities as $entity) {
+            $this->assertArrayHasKey($entity->getId(), $entitiesList, 'Item not found in list');
+
+            // Verify information
+            $entityKeys = array_keys($entity->getData());
+            foreach ($entityKeys as $k) {
+                // Perform non strict comparison due to SQL layer converting values to strings
+                $this->assertEquals(
+                    true,
+                    $entity->getData($k) == $entitiesList[$entity->getId()]->getData($k),
+                    'Field ' . $k . ' not correctly retrieved in list'
+                );
+            }
+        }
+    }
+}

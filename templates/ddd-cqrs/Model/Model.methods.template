@@ -1,7 +1,15 @@
     /**
      * @inheritdoc
      */
-    public function get%fn_name%(): %data_type%
+    public function get%fn_name%()
     {
         return $this->getData(self::%field_const%);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function set%fn_name%($value)
+    {
+        return $this->setData(self::%field_const%, $value);
     }

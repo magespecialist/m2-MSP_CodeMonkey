@@ -2,4 +2,11 @@
      * Get value for %field_name%
      * @return %data_type%
      */
-    public function get%fn_name%(): %data_type%;
+    public function get%fn_name%();
+
+    /**
+     * Set value for %field_name%
+     * @param %data_type% $value
+     * @return void
+     */
+    public function set%fn_name%($value);

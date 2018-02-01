@@ -11,7 +11,7 @@ interface %class% extends \Magento\Framework\Api\SearchResultsInterface
      * Get an array of objects
      * @return %data_interface%[]
      */
-    public function getItems(): array;
+    public function getItems();
 
     /**
      * Set objects list

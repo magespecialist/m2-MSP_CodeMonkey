@@ -14,11 +14,6 @@ use Magento\Framework\Api\SearchCriteriaInterface;
 class GetList implements GetListInterface
 {
     /**
-     * @var CollectionProcessorInterface
-     */
-    private $collectionProcessor;
-
-    /**
      * @var %collection%Factory
      */
     private $collectionFactory;
@@ -34,19 +29,16 @@ class GetList implements GetListInterface
     private $searchCriteriaBuilder;
 
     /**
-     * @param CollectionProcessorInterface $collectionProcessor
      * @param %collection%Factory $collectionFactory
      * @param %search_results_interface%Factory $searchResultsFactory
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @SuppressWarnings(PHPMD.LongVariable)
      */
     public function __construct(
-        CollectionProcessorInterface $collectionProcessor,
         %collection%Factory $collectionFactory,
         %search_results_interface%Factory $searchResultsFactory,
         SearchCriteriaBuilder $searchCriteriaBuilder
     ) {
-        $this->collectionProcessor = $collectionProcessor;
         $this->collectionFactory = $collectionFactory;
         $this->searchResultsFactory = $searchResultsFactory;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;

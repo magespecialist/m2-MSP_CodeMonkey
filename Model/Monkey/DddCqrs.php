@@ -20,6 +20,7 @@
 
 namespace MSP\CodeMonkey\Model\Monkey;
 
+use MEQP2\Tests\NamingConventions\true\mixed;
 use MSP\CodeMonkey\Model\Database;
 use MSP\CodeMonkey\Model\DiManager;
 use MSP\CodeMonkey\Model\Filesystem;
@@ -155,6 +156,7 @@ class DddCqrs
             'resource' => 'Model\\ResourceModel\\' . $this->entityName,
             'collection' => 'Model\\ResourceModel\\' . $this->entityName . '\\Collection',
             'repository' => 'Model\\' . $this->entityName . 'Repository',
+            'search_results' => 'Model\\' . $this->entityName . 'SearchResults',
 
             'command_get_interface' => 'Model\\' . $this->entityName . '\\Command\\GetInterface',
             'command_save_interface' => 'Model\\' . $this->entityName . '\\Command\\SaveInterface',
@@ -165,6 +167,8 @@ class DddCqrs
             'command_save' => 'Model\\' . $this->entityName . '\\Command\\Save',
             'command_delete' => 'Model\\' . $this->entityName . '\\Command\\Delete',
             'command_list' => 'Model\\' . $this->entityName . '\\Command\\GetList',
+
+            'test_repository' => 'Test\\Integration\\' . $this->entityName . '\\RepositoryTest',
         ]);
 
         $apiClasses = $this->moduleManager->generateClasses($this->apiModuleName, [
@@ -283,6 +287,7 @@ class DddCqrs
                 'namespace' => $this->classes['model']['info']['namespace'],
                 'class' => $this->classes['model']['info']['class_name'],
                 'data_interface' => $this->classes['data_interface']['class'],
+                'resource' => $this->classes['resource']['class'],
                 'extension_interface' => $extensionInterface,
                 'methods_list' => implode("\n\n", $modelMethodsList),
             ]),
@@ -293,7 +298,7 @@ class DddCqrs
      * Generate search result interface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    private function generateSearchResultInterface()
+    private function generateSearchResult()
     {
         $this->outFiles['search_results_interface'] = [
             'file' => $this->classes['search_results_interface']['file'],
@@ -301,6 +306,15 @@ class DddCqrs
                 'namespace' => $this->classes['search_results_interface']['info']['namespace'],
                 'class' => $this->classes['search_results_interface']['info']['class_name'],
                 'data_interface' => $this->classes['data_interface']['class'],
+            ]),
+        ];
+
+        $this->outFiles['search_results'] = [
+            'file' => $this->classes['search_results']['file'],
+            'code' => $this->template->getCodeFromTemplate('ddd-cqrs/Model/SearchResult', [
+                'namespace' => $this->classes['search_results']['info']['namespace'],
+                'class' => $this->classes['search_results']['info']['class_name'],
+                'interface' => $this->classes['search_results_interface']['class'],
             ]),
         ];
     }
@@ -593,7 +607,7 @@ class DddCqrs
         $this->diManager->createPreference(
             $this->moduleName,
             $this->classes['search_results_interface']['class'],
-            '\\Magento\\Framework\\Api\\SearchResults'
+            $this->classes['search_results']['class']
         );
 
         $this->diManager->createPreference(
@@ -627,6 +641,76 @@ class DddCqrs
     }
 
     /**
+     * Get random value by type
+     * @param $fieldType
+     * @return mixed
+     */
+    private function getRandomDataGeneratorByType($fieldType)
+    {
+        switch ($fieldType) {
+            case 'int':
+                return "(int) rand(0, 100)";
+
+            case 'tinyint':
+            case 'boolean':
+                return "(bool) rand(0, 1)";
+
+            case 'decimal':
+            case 'float':
+                return "(float) rand(0, 100) / 10";
+
+            case 'date':
+                return "date('Y-m-d', rand(0, time()))";
+
+            case 'time':
+                return "date('H:i:s', rand(0, time()))";
+
+            case 'datetime':
+                return "date('Y-m-d H:i:s', rand(0, time()))";
+
+            default:
+                return "'A random string ' . uniqid()";
+        }
+    }
+
+    /**
+     * Build repository tests
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    private function generateRepositoryTest()
+    {
+        $valuesGenerator = [];
+
+        foreach ($this->columns as $columnName => $columnInfo) {
+            if ($columnName === $this->primaryKey) {
+                continue;
+            }
+
+            $fieldConst = strtoupper($columnName);
+            $valuesGenerator[] = $this->template->getCodeFromTemplate(
+                'ddd-cqrs/Test/Integration/Model/RepositoryTest.create.values',
+                [
+                    'data_interface' => $this->classes['data_interface']['class'],
+                    'field_const' => $fieldConst,
+                    'value' => $this->getRandomDataGeneratorByType($columnInfo['DATA_TYPE']),
+                ]
+            );
+        }
+
+        $this->outFiles['test_repository'] = [
+            'file' => $this->classes['test_repository']['file'],
+            'code' => $this->template->getCodeFromTemplate('ddd-cqrs/Test/Integration/Model/RepositoryTest', [
+                'namespace' => $this->classes['test_repository']['info']['namespace'],
+                'class' => $this->classes['test_repository']['info']['class_name'],
+                'repository_interface' => $this->classes['repository_interface']['class'],
+                'data_interface' => $this->classes['data_interface']['class'],
+                'entity_var' => $this->entityVar,
+                'values_generator' => implode("\n", $valuesGenerator),
+            ]),
+        ];
+    }
+
+    /**
      * Create DDD-CQRS model and return a list of modified files
      * @return array
      * @throws \Magento\Framework\Exception\LocalizedException
@@ -638,12 +722,13 @@ class DddCqrs
         $this->generateModel();
         $this->generateResource();
         $this->generateCollection();
-        $this->generateSearchResultInterface();
+        $this->generateSearchResult();
         $this->generateCommandGet();
         $this->generateCommandSave();
         $this->generateCommandDelete();
         $this->generateCommandList();
         $this->generateRepository();
+        $this->generateRepositoryTest();
 
         $outFilesNames = [];
         foreach ($this->outFiles as $outFile) {

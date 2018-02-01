@@ -83,6 +83,10 @@ class Database extends AbstractDb
             case 'int':
                 return 'int';
 
+            case 'tinyint':
+            case 'boolean':
+                return 'bool';
+
             case 'decimal':
             case 'float':
                 return 'float';
