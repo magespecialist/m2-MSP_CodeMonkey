@@ -104,6 +104,11 @@ class DddCqrs
      */
     private $overwrite;
 
+    /**
+     * @var bool
+     */
+    private $tests;
+
     public function __construct(
         Template $template,
         PhpCode $phpCode,
@@ -115,7 +120,8 @@ class DddCqrs
         string $apiModuleName,
         string $entityName,
         string $tableName,
-        bool $overwrite
+        bool $overwrite,
+        bool $tests
     ) {
         $this->phpCode = $phpCode;
         $this->template = $template;
@@ -128,6 +134,7 @@ class DddCqrs
         $this->entityName = $entityName;
         $this->tableName = $tableName;
         $this->overwrite = $overwrite;
+        $this->tests = $tests;
     }
 
     /**
@@ -728,7 +735,10 @@ class DddCqrs
         $this->generateCommandDelete();
         $this->generateCommandList();
         $this->generateRepository();
-        $this->generateRepositoryTest();
+
+        if ($this->tests) {
+            $this->generateRepositoryTest();
+        }
 
         $outFilesNames = [];
         foreach ($this->outFiles as $outFile) {

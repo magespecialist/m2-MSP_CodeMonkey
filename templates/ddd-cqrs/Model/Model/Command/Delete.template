@@ -6,6 +6,8 @@ declare(strict_types=1);
 namespace %namespace%;
 
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Exception\CouldNotDeleteException;
+use Psr\Log\LoggerInterface;
 
 /**
  * @inheritdoc
@@ -23,12 +25,18 @@ class %class% implements %interface%
     private $commandGet;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @param %resource_model% $resource
      * @param %get_interface% $commandGet
      */
     public function __construct(
         %resource_model% $resource,
-        %get_interface% $commandGet
+        %get_interface% $commandGet,
+        LoggerInterface $logger
     ) {
         $this->resource = $resource;
         $this->commandGet = $commandGet;
@@ -40,7 +48,17 @@ class %class% implements %interface%
     public function execute(int $%entity_var%Id)
     {
         /** @var %data_interface% $%entity_var% */
-        $%entity_var% = $this->commandGet->execute($%entity_var%Id);
-        $this->resource->delete($%entity_var%);
+        try {
+            $%entity_var% = $this->commandGet->execute($%entity_var%Id);
+        } catch (NoSuchEntityException $e) {
+            return;
+        }
+
+        try {
+            $this->resource->delete($%entity_var%);
+        } catch (\Exception $e) {
+            $this->logger->error($e->getMessage());
+            throw new CouldNotDeleteException(__('Could not delete %entity_name%'), $e);
+        }
     }
 }

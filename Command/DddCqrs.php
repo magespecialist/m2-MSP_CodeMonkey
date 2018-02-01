@@ -47,6 +47,7 @@ class DddCqrs extends Command
         $this->setDescription('Create a full DDD-CQRS class set for a database entity (see MSI module)');
 
         $this->addOption('overwrite', null, InputOption::VALUE_NONE, 'Overwrite existing files');
+        $this->addOption('tests', null, InputOption::VALUE_NONE, 'Create integration tests');
         $this->addArgument('module', InputArgument::REQUIRED, 'Module name');
         $this->addArgument('module_api', InputArgument::REQUIRED, 'API Module name');
         $this->addArgument('entity_name', InputArgument::REQUIRED, 'Entity name');
@@ -75,6 +76,7 @@ class DddCqrs extends Command
             'entityName' => $entityName,
             'tableName' => $tableName,
             'overwrite' => (bool) $input->getOption('overwrite'),
+            'tests' => (bool) $input->getOption('tests'),
         ]);
 
         $files = $dddCqrs->execute();

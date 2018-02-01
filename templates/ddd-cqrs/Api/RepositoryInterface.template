@@ -13,9 +13,9 @@ interface %class%
     /**
      * Save %entity_name%
      * @param %data_interface% $%entity_var%
-     * @return void
+     * @return int
      */
-    public function save(%data_interface% $%entity_var%);
+    public function save(%data_interface% $%entity_var%): int;
 
     /**
      * Get %entity_name% by id
