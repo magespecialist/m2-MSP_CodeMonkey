@@ -25,6 +25,7 @@ class %class% implements %interface%
 
     /**
      * @param %resource_model% $resource
+     * @param LoggerInterface $logger
      */
     public function __construct(
         %resource_model% $resource,
