@@ -250,24 +250,22 @@ class DddCqrs
                 'field_name' => $columnName,
             ]);
 
-            $interfaceMethodsList[] = $this->template->getCodeFromTemplate('ddd-cqrs/Api/Data/Interface.methods', [
-                'data_type' => $this->database->getTypeByColumnType($columnInfo['DATA_TYPE']),
-                'data_interface' => $this->classes['data_interface']['class'],
-                'field_name' => $columnName,
-                'fn_name' => $columnName == $this->primaryKey ?
-                    'Id' :
-                    ucfirst($this->phpCode->toCamelCase($columnName)),
-            ]);
+            if ($columnName === $this->primaryKey) {
+                $interfaceMethodsList[] = $this->template->getCodeFromTemplate('ddd-cqrs/Api/Data/Interface.methods', [
+                    'data_type' => $this->database->getTypeByColumnType($columnInfo['DATA_TYPE']),
+                    'data_interface' => $this->classes['data_interface']['class'],
+                    'field_name' => $columnName,
+                    'fn_name' => ucfirst($this->phpCode->toCamelCase($columnName)),
+                ]);
 
-            $modelMethodsList[] = $this->template->getCodeFromTemplate('ddd-cqrs/Model/Model.methods', [
-                'data_type' => $this->database->getTypeByColumnType($columnInfo['DATA_TYPE']),
-                'data_interface' => $this->classes['data_interface']['class'],
-                'field_name' => $columnName,
-                'field_const' => $columnName == $this->primaryKey ? 'ID' : strtoupper($columnName),
-                'fn_name' => $columnName == $this->primaryKey ?
-                    'Id' :
-                    ucfirst($this->phpCode->toCamelCase($columnName)),
-            ]);
+                $modelMethodsList[] = $this->template->getCodeFromTemplate('ddd-cqrs/Model/Model.methods', [
+                    'data_type' => $this->database->getTypeByColumnType($columnInfo['DATA_TYPE']),
+                    'data_interface' => $this->classes['data_interface']['class'],
+                    'field_name' => $columnName,
+                    'field_const' => $columnName == $this->primaryKey ? 'ID' : strtoupper($columnName),
+                    'fn_name' => ucfirst($this->phpCode->toCamelCase($columnName)),
+                ]);
+            }
         }
 
         $extensionInterface = preg_replace(
@@ -354,6 +352,7 @@ class DddCqrs
                 'data_type' => $this->database->getTypeByColumnType($columnInfo['DATA_TYPE']),
                 'data_interface' => $this->classes['data_interface']['class'],
                 'entity_var' => $this->entityVar,
+                'entity_name' => $this->entityName,
                 'column_name' => ucfirst($this->phpCode->toCamelCase($columnName)),
                 'var_name' => lcfirst($this->phpCode->toCamelCase($columnName)),
             ]);

@@ -11,6 +11,19 @@ interface %class% extends ExtensibleDataInterface
 {
 %const_list%
 
+    /**
+     * Get value for rule_id
+     * @return int
+     */
+    public function getId();
+
+    /**
+     * Set value for rule_id
+     * @param int $value
+     * @return void
+     */
+    public function setId($value);
+
 %methods_list%
 
     /**

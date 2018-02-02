@@ -41,6 +41,7 @@ class %class% implements %interface%
     ) {
         $this->resource = $resource;
         $this->commandGet = $commandGet;
+        $this->logger = $logger;
     }
 
     /**

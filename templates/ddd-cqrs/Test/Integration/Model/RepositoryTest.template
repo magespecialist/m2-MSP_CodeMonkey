@@ -23,12 +23,14 @@ class %class% extends AbstractController
 
     protected function setUp()
     {
+        // @codingStandardsIgnoreStart
         $this->repository = Bootstrap::getObjectManager()->create(
             %repository_interface%::class
         );
         $this->factory = Bootstrap::getObjectManager()->create(
             %data_interface%Factory::class
         );
+        // @codingStandardsIgnoreEnd
     }
 
     /**
@@ -40,6 +42,35 @@ class %class% extends AbstractController
         return [
 %values_generator%
         ];
+    }
+
+    /**
+     * Compare two entities content
+     * @param %data_interface% $entityA
+     * @param %data_interface% $entityB
+     */
+    private function compareEntities(
+        %data_interface% $entityA,
+        %data_interface% $entityB
+    ) {
+        foreach ($entityA->getData() as $k => $v) {
+            if ($k === 'id') {
+                $this->assertEquals(
+                    true,
+                    $entityB->getId() == $v,
+                    'Field ' . $k . ' not corresponding'
+                );
+
+                continue;
+            }
+
+            // Perform non strict comparison due to SQL layer converting values to strings
+            $this->assertEquals(
+                true,
+                $entityB->getData($k) == $v,
+                'Field ' . $k . ' not corresponding'
+            );
+        }
     }
 
     /**
@@ -75,15 +106,7 @@ class %class% extends AbstractController
         // Retrieve entities and confirm
         foreach ($entities as $entity) {
             $entityGet = $this->repository->get((int) $entity->getId());
-
-            foreach ($entityGet->getData() as $k => $v) {
-                // Perform non strict comparison due to SQL layer converting values to strings
-                $this->assertEquals(
-                    true,
-                    $entity->getData($k) == $v,
-                    'Field ' . $k . ' not correctly saved or retrieved'
-                );
-            }
+            $this->compareEntities($entityGet, $entity);
         }
     }
 
@@ -116,17 +139,7 @@ class %class% extends AbstractController
         $entitiesList = $this->repository->getList()->getItems();
         foreach ($entities as $entity) {
             $this->assertArrayHasKey($entity->getId(), $entitiesList, 'Item not found in list');
-
-            // Verify information
-            $entityKeys = array_keys($entity->getData());
-            foreach ($entityKeys as $k) {
-                // Perform non strict comparison due to SQL layer converting values to strings
-                $this->assertEquals(
-                    true,
-                    $entity->getData($k) == $entitiesList[$entity->getId()]->getData($k),
-                    'Field ' . $k . ' not correctly retrieved in list'
-                );
-            }
+            $this->compareEntities($entity, $entitiesList[$entity->getId()]);
         }
     }
 }
