@@ -9,6 +9,9 @@ use Magento\TestFramework\Helper\Bootstrap;
 use Magento\TestFramework\TestCase\AbstractController;
 use Magento\Framework\Exception\NoSuchEntityException;
 
+/**
+ * @magentoDbIsolation enabled
+ */
 class %class% extends AbstractController
 {
     /**
