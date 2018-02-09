@@ -1,0 +1,22 @@
+<?php
+%header%
+
+declare(strict_types=1);
+
+namespace %namespace%;
+
+/**
+ * Backward compatibility wrapper for 2.1
+ */
+
+// @codingStandardsIgnoreStart
+if (!class_exists('\PHPUnit\Framework\TestCase')) {
+    class TestCaseWrapper extends \PHPUnit_Framework_TestCase {
+        public function expectException($className) {
+            return $this->setExpectedException($className);
+        }
+    };
+} else {
+    class TestCaseWrapper extends \PHPUnit\Framework\TestCase {};
+}
+// @codingStandardsIgnoreEnd

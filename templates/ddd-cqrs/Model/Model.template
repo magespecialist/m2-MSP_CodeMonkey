@@ -7,6 +7,9 @@ namespace %namespace%;
 
 use Magento\Framework\Model\AbstractExtensibleModel;
 
+/**
+ * @SuppressWarnings(PHPMD.CamelCaseMethodName)
+ */
 class %class% extends AbstractExtensibleModel implements
     %data_interface%
 {

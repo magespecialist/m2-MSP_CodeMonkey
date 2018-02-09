@@ -175,6 +175,7 @@ class DddCqrs
             'command_delete' => 'Model\\' . $this->entityName . '\\Command\\Delete',
             'command_list' => 'Model\\' . $this->entityName . '\\Command\\GetList',
 
+            'test_wrapper' => 'Test\\Integration\\' . $this->entityName . '\\TestCaseWrapper',
             'test_repository' => 'Test\\Integration\\' . $this->entityName . '\\RepositoryTest',
         ]);
 
@@ -680,6 +681,20 @@ class DddCqrs
     }
 
     /**
+     * Create test wrapper
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    private function generateTestCaseWrapper()
+    {
+        $this->outFiles['test_wrapper'] = [
+            'file' => $this->classes['test_wrapper']['file'],
+            'code' => $this->template->getCodeFromTemplate('ddd-cqrs/Test/Integration/TestCaseWrapper', [
+                'namespace' => $this->classes['test_wrapper']['info']['namespace'],
+            ]),
+        ];
+    }
+
+    /**
      * Build repository tests
      * @throws \Magento\Framework\Exception\LocalizedException
      */
@@ -708,6 +723,8 @@ class DddCqrs
             'code' => $this->template->getCodeFromTemplate('ddd-cqrs/Test/Integration/Model/RepositoryTest', [
                 'namespace' => $this->classes['test_repository']['info']['namespace'],
                 'class' => $this->classes['test_repository']['info']['class_name'],
+                'test_wrapper' => $this->classes['test_wrapper']['class'],
+                'test_wrapper_class' => $this->classes['test_wrapper']['info']['class'],
                 'repository_interface' => $this->classes['repository_interface']['class'],
                 'data_interface' => $this->classes['data_interface']['class'],
                 'entity_var' => $this->entityVar,
@@ -736,6 +753,7 @@ class DddCqrs
         $this->generateRepository();
 
         if ($this->tests) {
+            $this->generateTestCaseWrapper();
             $this->generateRepositoryTest();
         }
 

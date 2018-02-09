@@ -8,11 +8,12 @@ namespace %namespace%;
 use Magento\TestFramework\Helper\Bootstrap;
 use Magento\TestFramework\TestCase\AbstractController;
 use Magento\Framework\Exception\NoSuchEntityException;
+use %test_wrapper%;
 
 /**
  * @magentoDbIsolation enabled
  */
-class %class% extends AbstractController
+class %class% extends %test_wrapper_class%
 {
     /**
      * @var %repository_interface%
@@ -24,13 +25,16 @@ class %class% extends AbstractController
      */
     private $factory;
 
+    /**
+     * @inheritdoc
+     */
     protected function setUp()
     {
         // @codingStandardsIgnoreStart
-        $this->repository = Bootstrap::getObjectManager()->create(
+        $this->repository = Bootstrap::getObjectManager()->get(
             %repository_interface%::class
         );
-        $this->factory = Bootstrap::getObjectManager()->create(
+        $this->factory = Bootstrap::getObjectManager()->get(
             %data_interface%Factory::class
         );
         // @codingStandardsIgnoreEnd

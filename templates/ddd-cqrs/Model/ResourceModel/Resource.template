@@ -14,6 +14,9 @@ class %class% extends AbstractDb
 {
     const TABLE_NAME = '%table%';
 
+    /**
+     * @inheritdoc
+     */
     protected function _construct()
     {
         $this->_init(
