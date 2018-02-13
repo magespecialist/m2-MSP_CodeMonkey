@@ -21,14 +21,6 @@ class %class% extends AbstractExtensibleModel implements
         $this->_init(%resource%::class);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getId()
-    {
-        return $this->getData(self::ID);
-    }
-
 %methods_list%
 
     /**
