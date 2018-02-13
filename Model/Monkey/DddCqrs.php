@@ -251,7 +251,7 @@ class DddCqrs
                 'field_name' => $columnName,
             ]);
 
-            if ($columnName === $this->primaryKey) {
+            if ($columnName !== $this->primaryKey) {
                 $interfaceMethodsList[] = $this->template->getCodeFromTemplate('ddd-cqrs/Api/Data/Interface.methods', [
                     'data_type' => $this->database->getTypeByColumnType($columnInfo['DATA_TYPE']),
                     'data_interface' => $this->classes['data_interface']['class'],
