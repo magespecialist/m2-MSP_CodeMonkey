@@ -30,7 +30,7 @@ interface %class% extends ExtensibleDataInterface
      * Retrieve existing extension attributes object or create a new one
      * @return %extension_interface%|null
      */
-    public function getExtensionAttributes(): %extension_interface%;
+    public function getExtensionAttributes();
 
     /**
      * Set an extension attributes object

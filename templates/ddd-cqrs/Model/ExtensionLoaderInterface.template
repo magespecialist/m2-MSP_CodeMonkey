@@ -1,0 +1,20 @@
+<?php
+%header%
+
+declare(strict_types=1);
+
+namespace %namespace%;
+
+/**
+ * Extension attribute loader for %entity_name%
+ *
+ * @api
+ */
+interface %class%
+{
+    /**
+     * Load extension attributes
+     * @param %data_interface% $%entity_var%
+     */
+    public function execute(%data_interface% $%entity_var%);
+}

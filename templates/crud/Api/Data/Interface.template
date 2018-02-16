@@ -3,9 +3,7 @@
 
 namespace %namespace%;
 
-use Magento\Framework\Api\ExtensibleDataInterface;
-
-interface %class% extends ExtensibleDataInterface
+interface %class% extends \Magento\Framework\Api\ExtensibleDataInterface
 {
 %const_list%
 

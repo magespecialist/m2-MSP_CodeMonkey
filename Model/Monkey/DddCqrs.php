@@ -175,6 +175,9 @@ class DddCqrs
             'command_delete' => 'Model\\' . $this->entityName . '\\Command\\Delete',
             'command_list' => 'Model\\' . $this->entityName . '\\Command\\GetList',
 
+            'extension_loader' => 'Model\\' . $this->entityName . 'ExtensionLoader',
+            'extension_loader_interface' => 'Model\\' . $this->entityName . 'ExtensionLoaderInterface',
+
             'test_wrapper' => 'Test\\Integration\\' . $this->entityName . '\\TestCaseWrapper',
             'test_repository' => 'Test\\Integration\\' . $this->entityName . '\\RepositoryTest',
         ]);
@@ -596,6 +599,39 @@ class DddCqrs
     }
 
     /**
+     * Generate extension laoder files
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function generateExtensionLoader()
+    {
+        $this->outFiles['extension_loader_interface'] = [
+            'file' => $this->classes['extension_loader_interface']['file'],
+            'code' => $this->template->getCodeFromTemplate('ddd-cqrs/Model/ExtensionLoaderInterface', [
+                'namespace' => $this->classes['extension_loader_interface']['info']['namespace'],
+                'class' => $this->classes['extension_loader_interface']['info']['class_name'],
+                'data_interface' => $this->classes['data_interface']['class'],
+                'entity_var' => $this->entityVar,
+                'entity_name' => $this->entityName,
+            ]),
+        ];
+
+        $extensionFactory = preg_replace('/Interface$/', 'ExtensionFactory', $this->classes['data_interface']['class']);
+
+        $this->outFiles['extension_loader'] = [
+            'file' => $this->classes['extension_loader']['file'],
+            'code' => $this->template->getCodeFromTemplate('ddd-cqrs/Model/ExtensionLoader', [
+                'namespace' => $this->classes['extension_loader']['info']['namespace'],
+                'class' => $this->classes['extension_loader']['info']['class_name'],
+                'data_interface' => $this->classes['data_interface']['class'],
+                'entity_var' => $this->entityVar,
+                'entity_name' => $this->entityName,
+                'extension_factory' => $extensionFactory,
+                'extension_loader_interface' => $this->classes['extension_loader_interface']['class'],
+            ]),
+        ];
+    }
+
+    /**
      * Inject DI preferences
      * @throws \Magento\Framework\Exception\LocalizedException
      */
@@ -751,6 +787,7 @@ class DddCqrs
         $this->generateCommandDelete();
         $this->generateCommandList();
         $this->generateRepository();
+        $this->generateExtensionLoader();
 
         if ($this->tests) {
             $this->generateTestCaseWrapper();

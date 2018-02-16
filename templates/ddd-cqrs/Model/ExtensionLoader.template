@@ -1,0 +1,36 @@
+<?php
+%header%
+
+declare(strict_types=1);
+
+namespace %namespace%;
+
+class %class% implements %extension_loader_interface%
+{
+    /**
+     * @var %extension_factory%
+     */
+    private $extensionFactory;
+
+    /**
+     * Extension loader constructor.
+     * @param %extension_factory% $extensionFactory
+     * @SuppressWarnings(PHPMD.LongVariables)
+     */
+    public function __construct(
+        %extension_factory% $extensionFactory
+    ) {
+        $this->extensionFactory = $extensionFactory;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function execute(%data_interface% $%entity_var%)
+    {
+        if ($%entity_var%->getExtensionAttributes() === null) {
+            $extension = $this->extensionFactory->create();
+            $%entity_var%->setExtensionAttributes($extension);
+        }
+    }
+}

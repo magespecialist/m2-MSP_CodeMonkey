@@ -26,16 +26,9 @@ class %class% extends AbstractExtensibleModel implements
     /**
      * @inheritdoc
      */
-    public function getExtensionAttributes(): %extension_interface%
+    public function getExtensionAttributes()
     {
-        $extensionAttributes = $this->_getExtensionAttributes();
-        if (null === $extensionAttributes) {
-            $extensionAttributes = $this->extensionAttributesFactory->create(
-                %extension_interface%::class
-            );
-            $this->setExtensionAttributes($extensionAttributes);
-        }
-        return $extensionAttributes;
+        return $this->_getExtensionAttributes();
     }
 
     /**
