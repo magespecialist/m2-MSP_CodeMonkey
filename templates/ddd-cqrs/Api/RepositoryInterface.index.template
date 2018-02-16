@@ -2,5 +2,6 @@
      * Get by %column_name% value
      * @param %data_type% $%var_name%
      * @return %data_interface%
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getBy%column_name%(%data_type% $%var_name%): %data_interface%;

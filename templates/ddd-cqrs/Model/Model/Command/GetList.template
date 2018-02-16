@@ -87,8 +87,10 @@ class GetList implements GetListInterface
         $sortOrders = $searchCriteria->getSortOrders();
         if ($sortOrders) {
             foreach ($sortOrders as $sortOrder) {
-                $isAscending = $sortOrder->getDirection() == \Magento\Framework\Api\SortOrder::SORT_ASC;
-                $collection->addOrder($sortOrder->getField(), $isAscending ? 'ASC' : 'DESC');
+                if ($sortOrder->getField()) {
+                    $isAscending = $sortOrder->getDirection() == \Magento\Framework\Api\SortOrder::SORT_ASC;
+                    $collection->addOrder($sortOrder->getField(), $isAscending ? 'ASC' : 'DESC');
+                }
             }
         }
     }

@@ -724,7 +724,7 @@ class DddCqrs
                 'namespace' => $this->classes['test_repository']['info']['namespace'],
                 'class' => $this->classes['test_repository']['info']['class_name'],
                 'test_wrapper' => $this->classes['test_wrapper']['class'],
-                'test_wrapper_class' => $this->classes['test_wrapper']['info']['class'],
+                'test_wrapper_class' => $this->classes['test_wrapper']['info']['class_name'],
                 'repository_interface' => $this->classes['repository_interface']['class'],
                 'data_interface' => $this->classes['data_interface']['class'],
                 'entity_var' => $this->entityVar,
