@@ -673,6 +673,11 @@ class DddCqrs
             $this->classes['command_list_interface']['class'],
             $this->classes['command_list']['class']
         );
+        $this->diManager->createPreference(
+            $this->moduleName,
+            $this->classes['extension_loader_interface']['class'],
+            $this->classes['extension_loader']['class']
+        );
 
         foreach ($this->indexedColumns as $indexedColumn) {
             $this->diManager->createPreference(
