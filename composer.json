@@ -2,8 +2,9 @@
     "name": "msp/codemonkey",
     "description": "",
     "require": {
-        "php": "^7.0|^7.1",
+        "php": "^7.0|^7.1|^7.2",
         "msp/common": "*",
+        "magento/framework": "100.1.*|100.2.*|100.3.*",
         "magento/magento-composer-installer": "*"
     },
     "suggest": {
