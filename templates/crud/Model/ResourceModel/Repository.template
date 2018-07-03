@@ -196,6 +196,9 @@ class %class% implements %interface%
         $sortOrders = $searchCriteria->getSortOrders();
         if ($sortOrders) {
             foreach ($sortOrders as $sortOrder) {
+                if (empty($sortOrder->getData())) {
+                    continue;
+                }
                 $isAscending = $sortOrder->getDirection() == \Magento\Framework\Api\SortOrder::SORT_ASC;
                 $collection->addOrder($sortOrder->getField(), $isAscending ? 'ASC' : 'DESC');
             }
